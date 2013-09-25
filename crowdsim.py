@@ -59,13 +59,14 @@ class Simulation(object):
         self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
         
         self.agents.add(
-            Agent(  screen = self.screen,
+            Agent(  agent_id = self._spawned_agent_count,
+                    screen = self.screen,
                     game = self,
                     agent_image = self.agent_image,
                     field = self.field_rect,
                     init_position = ( randint(0, self.SCREEN_WIDTH), randint(0, self.SCREEN_HEIGHT)),
                     init_direction = (1, 1),
-                    speed = 0.05))
+                    max_speed = 0.05))
         self._spawned_agent_count += 1
 
 
@@ -74,6 +75,17 @@ class Simulation(object):
             field exluding its border.
         """
         return self.field_box.get_internal_rect()
+
+
+    def get_agent_neighbors(self, agent, dist_range):
+        neighbors =  []
+        for other in self.agents:
+            if not agent.id == other.id:
+                dist = agent.pos.get_distance(other.pos)
+                if dist <= dist_range:
+                    neighbors.append(other)
+
+        return neighbors
 
 
     def draw_grid(self):
@@ -156,6 +168,7 @@ class Simulation(object):
                 # Update and all agents
                 for agent in self.agents:
                     agent.update(time_passed)
+                    # print agent.id, len(self.get_agent_neighbors(agent, 800))
                     
                 self.draw()
                 

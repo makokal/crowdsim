@@ -4,6 +4,7 @@ from math import sin, cos, radians
 
 import pygame
 from pygame.sprite import Sprite
+from pygame.math import Vector3
 from utils import vec2d, SIM_COLORS
 
 
@@ -12,8 +13,9 @@ class Agent(Sprite):
     """ A agent sprite that bounces off walls and changes its
         direction from time to time.
     """
-    def __init__(self, screen, game, agent_image,
-            field, init_position, init_direction, speed):
+
+    def __init__(self, agent_id, screen, game, agent_image,
+            field, init_position, init_direction, max_speed):
         """ Create a new Agent.
         
             screen: 
@@ -41,28 +43,25 @@ class Agent(Sprite):
                 of the agent. Must have an angle that is a 
                 multiple of 45 degres.
             
-            speed: 
-                agent speed, in pixels/millisecond (px/ms)
+            max_speed: 
+                maximum agent speed, in pixels/millisecond (px/ms)
         """
         Sprite.__init__(self)
         
+        self.id  = agent_id
         self.screen = screen
         self.game = game
-        self.speed = speed
+        self.max_speed = max_speed
         self.field = field
         
         # self.image is the current image representing the agent
-        # in the game. It's rotated to the agent's direction.
-        #
         self.image = agent_image
         
         # A vector specifying the agent's position on the screen
-        #
         self.pos = vec2d(init_position)
         self.prev_pos = vec2d(self.pos)
 
         # The direction is a normalized vector
-        #
         self.direction = vec2d(init_direction).normalized()
 
 
@@ -76,20 +75,25 @@ class Agent(Sprite):
             self.pos.y - self.image_h / 2)
         self.screen.blit(self.image, self.draw_rect)
 
+        # draw the direction of the agent
         pygame.draw.line(
                 self.screen,
                 SIM_COLORS['red'],
                 (self.pos.x, self.pos.y),
                 (self.pos.x + self.direction.x*20, self.pos.y + self.direction.y*20))
 
+        # agent horizon
+        pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self.pos.x), int(self.pos.y)), 100, int(1))
+
 
     def update(self, time_passed):
         # self._compute_direction(time_passed)
         self._change_direction(time_passed)
+        self._compute_social_force()
 
         displacement = vec2d(    
-            self.direction.x * self.speed * time_passed,
-            self.direction.y * self.speed * time_passed)
+            self.direction.x * self.max_speed * time_passed,
+            self.direction.y * self.max_speed * time_passed)
         
         self.prev_pos = vec2d(self.pos)
         self.pos += displacement
@@ -140,4 +144,56 @@ class Agent(Sprite):
             self._counter = 0
 
 
-        
+    """ =================================================================  
+        Properties and how to compute them
+        =================================================================  
+    """
+    _social_force = Vector3(0, 0, 0)
+    _desired_force = Vector3(0, 0, 0)
+    _obstacle_force = Vector3(0, 0, 0)
+    _lookahead_force = Vector3(0, 0, 0)
+    _vx = 0.0
+    _vy = 0.0 
+    _ax = 0.0 
+    _ay = 0.0 
+
+
+    @property
+    def social_force(self):
+        return self._social_force
+
+    @property
+    def obstacle_force(self):
+        return self._obstacle_force
+
+    @property
+    def desired_force(self):
+        return self._desired_force
+
+    @property
+    def lookahead_force(self):
+        return self._lookahead_force
+
+    @property
+    def x(self):
+        return self.pos.x
+
+    @property
+    def y(self):
+        return self.pos.y
+
+    @property
+    def vx(self):
+        return self._vx
+
+    @property
+    def vy(self):
+        return self._vy
+
+
+
+
+
+
+    def _compute_social_force(self):
+        self._social_force = Vector3(10, 0, 0)
