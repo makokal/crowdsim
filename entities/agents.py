@@ -1,6 +1,6 @@
 
 from pygame.sprite import Sprite
-from pygame.math import Vector2
+from utils import vec2d
 
 
 
@@ -54,12 +54,12 @@ class Agent(Sprite):
         
         # A vector specifying the agent's position on the screen
         #
-        self.pos = Vector2(init_position)
-        self.prev_pos = Vector2(self.pos)
+        self.pos = vec2d(init_position)
+        self.prev_pos = vec2d(self.pos)
 
         # The direction is a normalized vector
         #
-        self.direction = Vector2(init_direction).normalize_ip()
+        self.direction = vec2d(init_direction).normalized()
 
 
     def draw(self):
@@ -72,8 +72,33 @@ class Agent(Sprite):
             self.pos.y - self.image_h / 2)
         self.screen.blit(self.image, self.draw_rect)
 
+
     def update(self, time_passed):
-        pass
+        self._compute_direction(time_passed)
+        displacement = vec2d(    
+            self.direction.x * self.speed * time_passed,
+            self.direction.y * self.speed * time_passed)
+        
+        self.prev_pos = vec2d(self.pos)
+        self.pos += displacement
+        
+        # When the image is rotated, its size is changed.
+        self.image_w, self.image_h = self.image.get_size()
+
+    def _compute_direction(self, time_passed):
+        """ Finds out where to go
+        """
+        coord = self.game.xy2coord(self.pos)
+        
+        x_mid, y_mid = self.game.coord2xy_mid(coord)
+        
+        if (    (x_mid - self.pos.x) * (x_mid - self.prev_pos.x) < 0 or
+                (y_mid - self.pos.y) * (y_mid - self.prev_pos.y) < 0):
+            next_coord = (coord[0]+1, coord[1]+1)
+    
+            self.direction = vec2d(
+                next_coord[1] - coord[1],
+                next_coord[0] - coord[0]).normalized()
 
 
         
