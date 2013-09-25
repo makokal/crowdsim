@@ -86,17 +86,19 @@ class Agent(Sprite):
         pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self.pos.x), int(self.pos.y)), 100, int(1))
 
 
-    def update(self, time_passed):
-        # self._compute_direction(time_passed)
-        self._change_direction(time_passed)
-        self._compute_social_force()
+    def update(self, time_passed):        
+        # self._change_direction(time_passed)
 
-        displacement = vec2d(    
-            self.direction.x * self.max_speed * time_passed,
-            self.direction.y * self.max_speed * time_passed)
-        
-        self.prev_pos = vec2d(self.pos)
-        self.pos += displacement
+        # displacement = vec2d(    
+        #     self.direction.x * self.max_speed * time_passed,
+        #     self.direction.y * self.max_speed * time_passed)
+            
+        # self.prev_pos = vec2d(self.pos)
+        # self.pos += displacement
+
+
+        self.social_move(time_passed)
+
         
         # When the image is rotated, its size is changed.
         self.image_w, self.image_h = self.image.get_size()
@@ -115,6 +117,38 @@ class Agent(Sprite):
             self.pos.y = bounds_rect.bottom
             self.direction.y *= -1
 
+
+    def social_move(self, time_passed):
+        # compute the forces
+        self._compute_social_force()
+        self._compute_desired_force()
+        self._compute_obstacle_force()
+        self._compute_lookahead_force()
+
+        # sum up all the forces
+        forces = Vector3(0, 0, 0)
+        forces[0] = self.social_force[0] + self.obstacle_force[0] + self.desired_force[0] + self.lookahead_force[0]
+        forces[1] = self.social_force[1] + self.obstacle_force[1] + self.desired_force[1] + self.lookahead_force[1]
+        forces[2] = self.social_force[2] + self.obstacle_force[2] + self.desired_force[2] + self.lookahead_force[2]
+
+        # calculate the velocity based on the acceleration (forces) and momentum
+        velocity = Vector3(0, 0, 0)
+        momentum = 0.75
+
+        velocity[0] = momentum * self.vx + forces[0]
+        velocity[1] = momentum * self.vy + forces[1]
+        velocity[2] = 0.0 # TODO - add z dimension
+
+        # check is resulting speed is beyond maximum speed
+        if velocity.length() > self.max_speed:
+            velocity[0] = (velocity[0] / velocity.length()) * self.max_speed
+            velocity[1] = (velocity[1] / velocity.length()) * self.max_speed
+            velocity[2] = (velocity[2] / velocity.length()) * self.max_speed
+
+        # update positions
+        displacement = vec2d(velocity[0] * time_passed, velocity[1] * time_passed)
+        self.prev_pos = vec2d(self.pos)
+        self.pos += displacement
 
 
     def _compute_direction(self, time_passed):
@@ -197,3 +231,12 @@ class Agent(Sprite):
 
     def _compute_social_force(self):
         self._social_force = Vector3(10, 0, 0)
+
+    def _compute_desired_force(self):
+        self._desired_force = Vector3(10, 10, 0)
+
+    def _compute_obstacle_force(self):
+        self._obstacle_force = Vector3(10, 10, 0)
+
+    def _compute_lookahead_force(self):
+        self._lookahead_force = Vector3(10, 0, 0)

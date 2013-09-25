@@ -15,9 +15,15 @@ class Timer(object):
     def __init__(self, interval, callback, oneshot=False):
         """ Create a new Timer.
         
-            interval: The timer interval in milliseconds
-            callback: Callable, to call when each interval expires
-            oneshot: True for a timer that only acts once
+            interval: 
+                The timer interval in milliseconds
+                
+            callback: 
+                Callable, to call when each interval expires
+                
+            oneshot: 
+                True for a timer that only acts once
+                
         """
         self.interval = interval
         self.callback = callback
