@@ -1,6 +1,10 @@
 
+from random import randint, choice
+from math import sin, cos, radians
+
+import pygame
 from pygame.sprite import Sprite
-from utils import vec2d
+from utils import vec2d, SIM_COLORS
 
 
 
@@ -72,9 +76,17 @@ class Agent(Sprite):
             self.pos.y - self.image_h / 2)
         self.screen.blit(self.image, self.draw_rect)
 
+        pygame.draw.line(
+                self.screen,
+                SIM_COLORS['red'],
+                (self.pos.x, self.pos.y),
+                (self.pos.x + self.direction.x*20, self.pos.y + self.direction.y*20))
+
 
     def update(self, time_passed):
-        self._compute_direction(time_passed)
+        # self._compute_direction(time_passed)
+        self._change_direction(time_passed)
+
         displacement = vec2d(    
             self.direction.x * self.speed * time_passed,
             self.direction.y * self.speed * time_passed)
@@ -84,6 +96,22 @@ class Agent(Sprite):
         
         # When the image is rotated, its size is changed.
         self.image_w, self.image_h = self.image.get_size()
+        bounds_rect = self.screen.get_rect().inflate(-self.image_w, -self.image_h)
+        
+        if self.pos.x < bounds_rect.left:
+            self.pos.x = bounds_rect.left
+            self.direction.x *= -1
+        elif self.pos.x > bounds_rect.right:
+            self.pos.x = bounds_rect.right
+            self.direction.x *= -1
+        elif self.pos.y < bounds_rect.top:
+            self.pos.y = bounds_rect.top
+            self.direction.y *= -1
+        elif self.pos.y > bounds_rect.bottom:
+            self.pos.y = bounds_rect.bottom
+            self.direction.y *= -1
+
+
 
     def _compute_direction(self, time_passed):
         """ Finds out where to go
@@ -99,6 +127,17 @@ class Agent(Sprite):
             self.direction = vec2d(
                 next_coord[1] - coord[1],
                 next_coord[0] - coord[0]).normalized()
+
+    _counter = 0
+    
+    def _change_direction(self, time_passed):
+        """ Turn by 45 degrees in a random direction once per
+            0.2 to 0.3 seconds.
+        """
+        self._counter += time_passed
+        if self._counter > randint(200, 300):
+            self.direction.rotate(45 * randint(-1, 1))
+            self._counter = 0
 
 
         

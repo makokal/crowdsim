@@ -63,8 +63,7 @@ class Simulation(object):
                     game = self,
                     agent_image = self.agent_image,
                     field = self.field_rect,
-                    init_position = ( self.field_rect.left + self.GRID_SIZE / 2,
-                                    self.field_rect.top + self.GRID_SIZE / 2),
+                    init_position = ( randint(0, self.SCREEN_WIDTH), randint(0, self.SCREEN_HEIGHT)),
                     init_direction = (1, 1),
                     speed = 0.05))
         self._spawned_agent_count += 1
