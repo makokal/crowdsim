@@ -1,6 +1,6 @@
 
 from random import randint, choice
-from math import sin, cos, radians
+from math import sin, cos, radians, exp, sqrt
 
 import pygame
 from pygame.sprite import Sprite
@@ -119,8 +119,11 @@ class Agent(Sprite):
 
 
     def social_move(self, time_passed):
+        # force is computed over neighbors with 0.5m radius (= 0.5*100 px)
+        _social_neighbors = self.game.get_agent_neighbors(self, (0.5*100))
+
         # compute the forces
-        self._compute_social_force()
+        self._social_force = self._compute_social_force()
         self._compute_desired_force()
         self._compute_obstacle_force()
         self._compute_lookahead_force()
@@ -190,6 +193,7 @@ class Agent(Sprite):
     _vy = 0.0 
     _ax = 0.0 
     _ay = 0.0 
+    _social_neighbors = []
 
 
     @property
@@ -224,19 +228,36 @@ class Agent(Sprite):
     def vy(self):
         return self._vy
 
-
-
-
-
+     
 
     def _compute_social_force(self):
-        self._social_force = Vector3(10, 0, 0)
+        social_force = Vector3(0, 0, 0)
+
+        for neighbor in self._social_neighbors:
+            force = Vector3(0, 0, 0)
+
+            if not neighbor.id == self.id:
+                dist = self.pos.get_distance(neighbor.pos)
+                exp_dist = exp(sqrt(dist) - 1)
+
+                # [2cm - 20m] range
+                if dist > (0.02 * 100) and dist < (20*100):
+                    force[0] = (neighbor.pos.x - self.pos.x) / exp_dist
+                    force[1] = (neighbor.pos.y - self.pos.y) / exp_dist
+
+                social_force[0] = force[0]
+                social_force[1] = force[1]
+                social_force[2] = force[2]
+
+        return social_force
+
+
 
     def _compute_desired_force(self):
-        self._desired_force = Vector3(10, 10, 0)
+        self._desired_force = Vector3(0, 0, 0)
 
     def _compute_obstacle_force(self):
-        self._obstacle_force = Vector3(10, 10, 0)
+        self._obstacle_force = Vector3(0, 0, 0)
 
     def _compute_lookahead_force(self):
-        self._lookahead_force = Vector3(10, 0, 0)
+        self._lookahead_force = Vector3(0, 0, 0)
