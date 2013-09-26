@@ -7,7 +7,7 @@ from pygame import Rect, Color
 from pygame.sprite import Sprite
 
 from entities import Agent, Waypoint, Obstacle
-from utils import Timer, Box, GridMap, SIM_COLORS
+from utils import Timer, Box, GridMap, SIM_COLORS, SCALE
 
 class Simulation(object):
     """ 
@@ -40,8 +40,8 @@ class Simulation(object):
 
         # agents
         self.agents = pygame.sprite.Group()
-        self.spawn_new_agent()
-        self.agent_spawn_timer = Timer(500, self.spawn_new_agent)
+
+        self.simulation_timer = Timer(50, self.simulation_update)
 
         # create the grid
         self.grid_nrows = self.FIELD_SIZE[1] / self.GRID_SIZE
@@ -50,23 +50,26 @@ class Simulation(object):
 
         self.options = dict(draw_grid=False)
 
+        self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
+
 
     _spawned_agent_count = 0
     def spawn_new_agent(self):
-        if self._spawned_agent_count >= 50:
+        if self._spawned_agent_count >= 5:
             return
-
-        self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
-        
+ 
         self.agents.add(
             Agent(  agent_id = self._spawned_agent_count,
                     screen = self.screen,
                     game = self,
                     agent_image = self.agent_image,
                     field = self.field_rect,
-                    init_position = ( randint(0, self.SCREEN_WIDTH), randint(0, self.SCREEN_HEIGHT)),
+                    init_position = ( 1, 1),
                     init_direction = (1, 1),
-                    max_speed = 0.05))
+                    max_speed = 0.05,
+                    waypoints = []
+                    )
+                )
         self._spawned_agent_count += 1
 
 
@@ -147,14 +150,58 @@ class Simulation(object):
         o1.draw()
         
 
+    def demo_populate_scene(self):
+        # popupate the scene with waypoints, obstacles and agents
+        # waypoints
+        self.waypoints = {
+        'start': Waypoint(self.screen, 0, 'normal', (2,1), 0.3),
+        'stop': Waypoint(self.screen, 1, 'normal', (4,5), 0.3)
+        }
+
+        self.agents.add(
+                Agent(  agent_id = 0,
+                    screen = self.screen,
+                    game = self,
+                    agent_image = self.agent_image,
+                    field = self.field_rect,
+                    init_position = ( 1, 1),
+                    init_direction = (1, 1),
+                    max_speed = 0.05,
+                    waypoints = [self.waypoints['start'], self.waypoints['stop']]
+                    )
+            )
+        self.agents.add(
+                Agent(  agent_id = 1,
+                    screen = self.screen,
+                    game = self,
+                    agent_image = self.agent_image,
+                    field = self.field_rect,
+                    init_position = ( 1, 1),
+                    init_direction = (1, 1),
+                    max_speed = 0.05,
+                    waypoints = [self.waypoints['start'], self.waypoints['stop']]
+                    )
+            )
+
+
+    def simulation_update(self):
+        for agent in self.agents:
+            agent.update(1)
+            agent.draw()
+        self.draw()
+
+
     def run(self):
         # The main game loop
-        #
+        
+        # populate the scene
+        self.demo_populate_scene()
+
         while True:
             # Limit frame speed to 30 FPS
-            time_passed = self.clock.tick(30)
+            self.time_passed = self.clock.tick(30)
             
-            if time_passed > 100:
+            if self.time_passed > 100:
                 continue
             
             for event in pygame.event.get():
@@ -170,13 +217,13 @@ class Simulation(object):
                     pass
             
             if not self.paused:     
-                self.agent_spawn_timer.update(time_passed)
+                self.simulation_timer.update(self.time_passed)
                 
                 # Update and all agents
-                for agent in self.agents:
-                    agent.update(time_passed)
+                # for agent in self.agents:
+                    # agent.update(time_passed)
                     
-                self.draw()
+                # self.draw()
                 
             pygame.display.flip()
 

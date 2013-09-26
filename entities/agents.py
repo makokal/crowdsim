@@ -5,7 +5,7 @@ from math import sin, cos, radians, exp, sqrt
 import pygame
 from pygame.sprite import Sprite
 from pygame.math import Vector3
-from utils import vec2d, SIM_COLORS
+from utils import vec2d, SIM_COLORS, SCALE
 
 
 
@@ -15,7 +15,7 @@ class Agent(Sprite):
     """
 
     def __init__(self, agent_id, screen, game, agent_image,
-            field, init_position, init_direction, max_speed):
+            field, init_position, init_direction, max_speed, waypoints):
         """ Create a new Agent.
         
             screen: 
@@ -36,7 +36,7 @@ class Agent(Sprite):
                 
             init_position:
                 A vec2d or a pair specifying the initial position
-                of the agent on the screen.
+                of the agent on the screen in metres
             
             init_direction:
                 A vec2d or a pair specifying the initial direction
@@ -45,6 +45,9 @@ class Agent(Sprite):
             
             max_speed: 
                 maximum agent speed, in pixels/millisecond (px/ms)
+
+            waypoints:
+                a list of waypoints for the agent to follow
         """
         Sprite.__init__(self)
         
@@ -63,6 +66,9 @@ class Agent(Sprite):
 
         # The direction is a normalized vector
         self.direction = vec2d(init_direction).normalized()
+        self._vx, self._vy = self.direction[0], self.direction[1]
+
+        self._waypoints = waypoints
 
 
     def draw(self):
@@ -71,56 +77,52 @@ class Agent(Sprite):
         """
 
         self.draw_rect = self.image.get_rect().move(
-            self.pos.x - self.image_w / 2, 
-            self.pos.y - self.image_h / 2)
+            (self.pos.x*SCALE) - self.image_w / 2, 
+            (self.pos.y*SCALE) - self.image_h / 2)
         self.screen.blit(self.image, self.draw_rect)
 
         # draw the direction of the agent
         pygame.draw.line(
                 self.screen,
                 SIM_COLORS['red'],
-                (self.pos.x, self.pos.y),
-                (self.pos.x + self.direction.x*20, self.pos.y + self.direction.y*20))
+                ((self.pos.x*SCALE), (self.pos.y*SCALE)),
+                ((self.pos.x*SCALE) + self.vx*20, (self.pos.y*SCALE) + self.vy*20))
 
         # agent horizon
-        pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self.pos.x), int(self.pos.y)), 100, int(1))
+        pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self.pos.x*SCALE), int(self.pos.y*SCALE)), 50, int(1))
 
 
     def update(self, time_passed):        
         # self._change_direction(time_passed)
-
         # displacement = vec2d(    
         #     self.direction.x * self.max_speed * time_passed,
-        #     self.direction.y * self.max_speed * time_passed)
-            
+        #     self.direction.y * self.max_speed * time_passed)            
         # self.prev_pos = vec2d(self.pos)
         # self.pos += displacement
 
-
         self.social_move(time_passed)
-
         
         # When the image is rotated, its size is changed.
         self.image_w, self.image_h = self.image.get_size()
         bounds_rect = self.screen.get_rect().inflate(-self.image_w, -self.image_h)
         
-        if self.pos.x < bounds_rect.left:
-            self.pos.x = bounds_rect.left
+        if self.pos.x*SCALE < bounds_rect.left:
+            self.pos.x = bounds_rect.left/SCALE
             self.direction.x *= -1
-        elif self.pos.x > bounds_rect.right:
-            self.pos.x = bounds_rect.right
+        elif self.pos.x*SCALE > bounds_rect.right:
+            self.pos.x = bounds_rect.right/SCALE
             self.direction.x *= -1
-        elif self.pos.y < bounds_rect.top:
-            self.pos.y = bounds_rect.top
+        elif self.pos.y*SCALE < bounds_rect.top:
+            self.pos.y = bounds_rect.top/SCALE
             self.direction.y *= -1
-        elif self.pos.y > bounds_rect.bottom:
-            self.pos.y = bounds_rect.bottom
+        elif self.pos.y*SCALE > bounds_rect.bottom:
+            self.pos.y = bounds_rect.bottom/SCALE
             self.direction.y *= -1
 
 
     def social_move(self, time_passed):
         # force is computed over neighbors with 0.5m radius (= 0.5*100 px)
-        _social_neighbors = self.game.get_agent_neighbors(self, (0.5*100))
+        _social_neighbors = self.game.get_agent_neighbors(self, (0.5*SCALE))
 
         # compute the forces
         self._social_force = self._compute_social_force()
@@ -148,8 +150,9 @@ class Agent(Sprite):
             velocity[1] = (velocity[1] / velocity.length()) * self.max_speed
             velocity[2] = (velocity[2] / velocity.length()) * self.max_speed
 
-        # update positions
-        displacement = vec2d(velocity[0] * time_passed, velocity[1] * time_passed)
+        # update positions and velocities
+        self._vx, self._vy = velocity[0], velocity[1]
+        displacement = vec2d(self.vx * time_passed, self.vy * time_passed)
         self.prev_pos = vec2d(self.pos)
         self.pos += displacement
 
@@ -194,6 +197,8 @@ class Agent(Sprite):
     _ax = 0.0 
     _ay = 0.0 
     _social_neighbors = []
+    _waypoints = []
+    _waypoint_index = 0
 
 
     @property
@@ -228,6 +233,16 @@ class Agent(Sprite):
     def vy(self):
         return self._vy
 
+    @property
+    def waypoints(self):
+        return self._waypoints
+
+    @property
+    def next_waypoint(self):
+        return self._waypoints[self._waypoint_index]
+
+
+
      
 
     def _compute_social_force(self):
@@ -241,7 +256,7 @@ class Agent(Sprite):
                 exp_dist = exp(sqrt(dist) - 1)
 
                 # [2cm - 20m] range
-                if dist > (0.02 * 100) and dist < (20*100):
+                if dist > (0.02 * SCALE) and dist < (20*SCALE):
                     force[0] = (neighbor.pos.x - self.pos.x) / exp_dist
                     force[1] = (neighbor.pos.y - self.pos.y) / exp_dist
 
@@ -254,10 +269,10 @@ class Agent(Sprite):
 
 
     def _compute_desired_force(self):
-        self._desired_force = Vector3(0, -10, 0)
+        self._desired_force = Vector3(0, 0, 0)
 
     def _compute_obstacle_force(self):
-        self._obstacle_force = Vector3(10, 0, 0)
+        self._obstacle_force = Vector3(0, 0, 0)
 
     def _compute_lookahead_force(self):
         self._lookahead_force = Vector3(0, 0, 0)
