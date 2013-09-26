@@ -3,3 +3,4 @@ from widgets import Box
 from vec2d import vec2d
 from gridmap import GridMap
 from colors import *
+from constants import *

@@ -6,12 +6,12 @@ import pygame
 from pygame import Rect, Color
 from pygame.sprite import Sprite
 
-from entities import Agent
+from entities import Agent, Waypoint, Obstacle
 from utils import Timer, Box, GridMap, SIM_COLORS
 
 class Simulation(object):
     """ 
-    The man simulation entry point 
+    The main simulation entry point 
     """
 
     SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
@@ -138,6 +138,13 @@ class Simulation(object):
                 
         for agent in self.agents:
             agent.draw()
+
+        # add some test waypoints
+        wp = Waypoint(self.screen, 0, 'normal', (2,2), 0.5)
+        wp.draw()
+
+        o1 = Obstacle(self.screen, 0, 'Line', (3, 3, 1, 5))
+        o1.draw()
         
 
     def run(self):
@@ -168,7 +175,6 @@ class Simulation(object):
                 # Update and all agents
                 for agent in self.agents:
                     agent.update(time_passed)
-                    # print agent.id, len(self.get_agent_neighbors(agent, 800))
                     
                 self.draw()
                 

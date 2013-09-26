@@ -254,10 +254,10 @@ class Agent(Sprite):
 
 
     def _compute_desired_force(self):
-        self._desired_force = Vector3(0, 0, 0)
+        self._desired_force = Vector3(0, -10, 0)
 
     def _compute_obstacle_force(self):
-        self._obstacle_force = Vector3(0, 0, 0)
+        self._obstacle_force = Vector3(10, 0, 0)
 
     def _compute_lookahead_force(self):
         self._lookahead_force = Vector3(0, 0, 0)
