@@ -5,8 +5,8 @@ from math import sin, cos, radians, exp, sqrt
 import pygame
 from pygame.sprite import Sprite
 from pygame.math import Vector3
-from utils import vec2d, SIM_COLORS, SCALE
-
+from utils import SIM_COLORS, SCALE
+from utils import euclidean_distance, vec2d
 
 
 class Agent(Sprite):
@@ -69,6 +69,7 @@ class Agent(Sprite):
         self._vx, self._vy = self.direction[0], self.direction[1]
 
         self._waypoints = waypoints
+        self._waypoint_index = 0
 
 
     def draw(self):
@@ -81,15 +82,35 @@ class Agent(Sprite):
             (self.pos.y*SCALE) - self.image_h / 2)
         self.screen.blit(self.image, self.draw_rect)
 
-        # draw the direction of the agent
-        pygame.draw.line(
-                self.screen,
-                SIM_COLORS['red'],
-                ((self.pos.x*SCALE), (self.pos.y*SCALE)),
-                ((self.pos.x*SCALE) + self.vx*20, (self.pos.y*SCALE) + self.vy*20))
+        # draw the forces on the agent
+        self.draw_forces()
 
         # agent horizon
         pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self.pos.x*SCALE), int(self.pos.y*SCALE)), 50, int(1))
+
+
+    def draw_forces(self):
+        # desired force
+        pygame.draw.line(self.screen, SIM_COLORS['red'],
+                ((self.pos.x*SCALE), (self.pos.y*SCALE)),
+                ((self.pos.x*SCALE) + self.desired_force[0]*400, (self.pos.y*SCALE) + self.desired_force[1]*400))
+
+        # social force
+        pygame.draw.line(self.screen, SIM_COLORS['green'],
+                ((self.pos.x*SCALE), (self.pos.y*SCALE)),
+                ((self.pos.x*SCALE) + self.social_force[0]*400, (self.pos.y*SCALE) + self.social_force[1]*400))
+
+
+
+    def reached_waypoint(self, waypoint):
+        """ Check if the agent has reached the given waypoint so we 
+            advance to the next one. Reaching means being in the 
+            waypoint circle
+        """
+        if euclidean_distance((self.x, self.y), waypoint.position) <= waypoint.radius:
+            return True
+        else:
+            return False
 
 
     def update(self, time_passed):        
@@ -122,13 +143,13 @@ class Agent(Sprite):
 
     def social_move(self, time_passed):
         # force is computed over neighbors with 0.5m radius (= 0.5*100 px)
-        _social_neighbors = self.game.get_agent_neighbors(self, (0.5*SCALE))
+        self._social_neighbors = self.game.get_agent_neighbors(self, (0.5*SCALE))
 
         # compute the forces
         self._social_force = self._compute_social_force()
-        self._compute_desired_force()
-        self._compute_obstacle_force()
-        self._compute_lookahead_force()
+        self._desired_force = self._compute_desired_force()
+        self._obstacle_force = self._compute_obstacle_force()
+        self._lookahead_force = self._compute_lookahead_force()
 
         # sum up all the forces
         forces = Vector3(0, 0, 0)
@@ -268,11 +289,37 @@ class Agent(Sprite):
 
 
 
+    _old_wp = (0, 0)
+
     def _compute_desired_force(self):
-        self._desired_force = Vector3(0, 0, 0)
+        if self.reached_waypoint(self.next_waypoint):
+            self._old_wp = self.next_waypoint.position
+            self._waypoint_index += 1
+
+        # if all waypoints are covered, go back to the beginning
+        if self._waypoint_index == len(self.waypoints):
+            self._waypoint_index = 0
+
+        # compute the force to the next waypoint
+        # wp_force = self.next_waypoint.attaction_force(self, self.x*SCALE, self.y*SCALE, 
+        #                             self._old_wp[0]*SCALE, self._old_wp[1]*SCALE)
+
+        wp_force = self.next_waypoint.force_to(self)
+
+        desired_force = Vector3(0, 0, 0)
+        desired_force[0] = wp_force[0] * self.max_speed
+        desired_force[1] = wp_force[1] * self.max_speed
+        desired_force[2] = wp_force[2] * self.max_speed
+
+        return desired_force
+
 
     def _compute_obstacle_force(self):
-        self._obstacle_force = Vector3(0, 0, 0)
+        obstacle_force = Vector3(0, 0, 0)
+        return obstacle_force
 
     def _compute_lookahead_force(self):
-        self._lookahead_force = Vector3(0, 0, 0)
+        lookahead_force = Vector3(0, 0, 0)
+        return lookahead_force
+
+

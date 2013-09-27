@@ -139,23 +139,20 @@ class Simulation(object):
         if self.options['draw_grid']:
             self.draw_grid()
                 
+        for waypoint in self.waypoints:
+            self.waypoints[waypoint].draw()
+
         for agent in self.agents:
             agent.draw()
 
-        # add some test waypoints
-        wp = Waypoint(self.screen, 0, 'normal', (2,2), 0.5)
-        wp.draw()
-
-        o1 = Obstacle(self.screen, 0, 'Line', (3, 3, 1, 5))
-        o1.draw()
-        
 
     def demo_populate_scene(self):
         # popupate the scene with waypoints, obstacles and agents
         # waypoints
         self.waypoints = {
-        'start': Waypoint(self.screen, 0, 'normal', (2,1), 0.3),
-        'stop': Waypoint(self.screen, 1, 'normal', (4,5), 0.3)
+        'start': Waypoint(self.screen, 'start', 'normal', (2,1), 0.3),
+        'stop': Waypoint(self.screen, 'stop', 'normal', (4,5), 0.3),
+        'fuel': Waypoint(self.screen, 'fuel', 'normal', (5,2), 0.3)
         }
 
         self.agents.add(
@@ -167,7 +164,7 @@ class Simulation(object):
                     init_position = ( 1, 1),
                     init_direction = (1, 1),
                     max_speed = 0.05,
-                    waypoints = [self.waypoints['start'], self.waypoints['stop']]
+                    waypoints = [self.waypoints['stop'], self.waypoints['start'], self.waypoints['fuel']]
                     )
             )
         self.agents.add(
@@ -176,10 +173,10 @@ class Simulation(object):
                     game = self,
                     agent_image = self.agent_image,
                     field = self.field_rect,
-                    init_position = ( 1, 1),
+                    init_position = ( 5, 4),
                     init_direction = (1, 1),
                     max_speed = 0.05,
-                    waypoints = [self.waypoints['start'], self.waypoints['stop']]
+                    waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
                     )
             )
 
