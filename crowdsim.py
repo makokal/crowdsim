@@ -17,8 +17,6 @@ class Simulation(object):
     SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
     GRID_SIZE = 20
     FIELD_SIZE = 700, 600
-    N_AGENTS = 50
-
 
     def __init__(self, args=None):
         pygame.init()
@@ -52,25 +50,6 @@ class Simulation(object):
 
         self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
 
-
-    _spawned_agent_count = 0
-    def spawn_new_agent(self):
-        if self._spawned_agent_count >= 5:
-            return
- 
-        self.agents.add(
-            Agent(  agent_id = self._spawned_agent_count,
-                    screen = self.screen,
-                    game = self,
-                    agent_image = self.agent_image,
-                    field = self.field_rect,
-                    init_position = ( 1, 1),
-                    init_direction = (1, 1),
-                    max_speed = 0.05,
-                    waypoints = []
-                    )
-                )
-        self._spawned_agent_count += 1
 
 
     def get_field_rect(self):
@@ -142,6 +121,9 @@ class Simulation(object):
         for waypoint in self.waypoints:
             self.waypoints[waypoint].draw()
 
+        for obstacle in self.obstacles:
+            obstacle.draw()
+
         for agent in self.agents:
             agent.draw()
 
@@ -152,9 +134,10 @@ class Simulation(object):
         self.waypoints = {
         'start': Waypoint(self.screen, 'start', 'normal', (2,1), 0.3),
         'stop': Waypoint(self.screen, 'stop', 'normal', (4,5), 0.3),
-        'fuel': Waypoint(self.screen, 'fuel', 'normal', (5,2), 0.3)
+        'fuel': Waypoint(self.screen, 'fuel', 'normal', (6,2), 0.3)
         }
 
+        # agents
         self.agents.add(
                 Agent(  agent_id = 0,
                     screen = self.screen,
@@ -179,6 +162,13 @@ class Simulation(object):
                     waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
                     )
             )
+
+        # add some obstacles
+        self.obstacles = []
+        # self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2,3,1,1)))
+        self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
+        self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (4,1,0.5,0)))
+
 
 
     def simulation_update(self):

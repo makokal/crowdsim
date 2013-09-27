@@ -98,7 +98,12 @@ class Agent(Sprite):
         # social force
         pygame.draw.line(self.screen, SIM_COLORS['green'],
                 ((self.pos.x*SCALE), (self.pos.y*SCALE)),
-                ((self.pos.x*SCALE) + self.social_force[0]*400, (self.pos.y*SCALE) + self.social_force[1]*400))
+                ((self.pos.x*SCALE) + self.social_force[0]*SCALE, (self.pos.y*SCALE) + self.social_force[1]*SCALE))
+
+        # obstacle force
+        pygame.draw.line(self.screen, SIM_COLORS['aqua'],
+                ((self.pos.x*SCALE), (self.pos.y*SCALE)),
+                ((self.pos.x*SCALE) + self.obstacle_force[0]*SCALE, (self.pos.y*SCALE) + self.obstacle_force[1]*SCALE))
 
 
 
@@ -153,9 +158,9 @@ class Agent(Sprite):
 
         # sum up all the forces
         forces = Vector3(0, 0, 0)
-        forces[0] = self.social_force[0] + self.obstacle_force[0] + self.desired_force[0] + self.lookahead_force[0]
-        forces[1] = self.social_force[1] + self.obstacle_force[1] + self.desired_force[1] + self.lookahead_force[1]
-        forces[2] = self.social_force[2] + self.obstacle_force[2] + self.desired_force[2] + self.lookahead_force[2]
+        forces[0] = 1*self.social_force[0] + 10*self.obstacle_force[0] + 500*self.desired_force[0] + self.lookahead_force[0]
+        forces[1] = 1*self.social_force[1] + 10*self.obstacle_force[1] + 500*self.desired_force[1] + self.lookahead_force[1]
+        forces[2] = 1*self.social_force[2] + 10*self.obstacle_force[2] + 500*self.desired_force[2] + self.lookahead_force[2]
 
         # calculate the velocity based on the acceleration (forces) and momentum
         velocity = Vector3(0, 0, 0)
@@ -309,6 +314,19 @@ class Agent(Sprite):
 
     def _compute_obstacle_force(self):
         obstacle_force = Vector3(0, 0, 0)
+
+        # find the closest obstacle and the closest point on it
+        cd, p = self.game.obstacles[0].agent_distance(self)
+        for obstacle in self.game.obstacles:
+            nd, np = obstacle.agent_distance(self)
+
+            if nd < cd:
+                cd, p = nd, np
+
+        # compute the direction of the force
+        obstacle_force[0] = -(self.x - p[0]) / exp(cd - 1)
+        obstacle_force[1] = -(self.y - p[1]) / exp(cd - 1)
+
         return obstacle_force
 
     def _compute_lookahead_force(self):
