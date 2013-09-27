@@ -146,7 +146,7 @@ class Simulation(object):
                     field = self.field_rect,
                     init_position = ( 1, 1),
                     init_direction = (1, 1),
-                    max_speed = 0.05,
+                    max_speed = 0.5,
                     waypoints = [self.waypoints['stop'], self.waypoints['start'], self.waypoints['fuel']]
                     )
             )
@@ -158,15 +158,15 @@ class Simulation(object):
                     field = self.field_rect,
                     init_position = ( 5, 4),
                     init_direction = (1, 1),
-                    max_speed = 0.05,
+                    max_speed = 0.25,
                     waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
                     )
             )
 
         # add some obstacles
         self.obstacles = []
-        # self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2,3,1,1)))
-        self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
+        self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2,3,1,1)))
+        # self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
         self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (4,1,0.5,0)))
 
 
