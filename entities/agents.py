@@ -289,20 +289,13 @@ class Agent(Sprite):
 
 
 
-    _old_wp = (0, 0)
-
     def _compute_desired_force(self):
         if self.reached_waypoint(self.next_waypoint):
-            self._old_wp = self.next_waypoint.position
             self._waypoint_index += 1
 
         # if all waypoints are covered, go back to the beginning
         if self._waypoint_index == len(self.waypoints):
             self._waypoint_index = 0
-
-        # compute the force to the next waypoint
-        # wp_force = self.next_waypoint.attaction_force(self, self.x*SCALE, self.y*SCALE, 
-        #                             self._old_wp[0]*SCALE, self._old_wp[1]*SCALE)
 
         wp_force = self.next_waypoint.force_to(self)
 
