@@ -151,7 +151,7 @@ class Agent(Sprite):
         self._social_neighbors = self.game.get_agent_neighbors(self, (0.5*SCALE))
 
         # compute the forces
-        # self._social_force = self._compute_social_force()
+        self._social_force = self._compute_social_force()
         self._desired_force = self._compute_desired_force()
         self._obstacle_force = self._compute_obstacle_force()
         self._lookahead_force = self._compute_lookahead_force()

@@ -146,7 +146,7 @@ class Simulation(object):
                     field = self.field_rect,
                     init_position = ( 1, 1),
                     init_direction = (1, 1),
-                    max_speed = 0.5,
+                    max_speed = 1.0,
                     waypoints = [self.waypoints['stop'], self.waypoints['start'], self.waypoints['fuel']]
                     )
             )
@@ -158,7 +158,7 @@ class Simulation(object):
                     field = self.field_rect,
                     init_position = ( 5, 4),
                     init_direction = (1, 1),
-                    max_speed = 0.25,
+                    max_speed = 1.25,
                     waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
                     )
             )
