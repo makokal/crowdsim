@@ -146,7 +146,7 @@ class Simulation(object):
                     field = self.field_rect,
                     init_position = ( 1, 1),
                     init_direction = (1, 1),
-                    max_speed = 1.0,
+                    max_speed = 1.8,
                     waypoints = [self.waypoints['stop'], self.waypoints['start'], self.waypoints['fuel']]
                     )
             )
@@ -158,7 +158,7 @@ class Simulation(object):
                     field = self.field_rect,
                     init_position = ( 5, 4),
                     init_direction = (1, 1),
-                    max_speed = 1.25,
+                    max_speed = 1.34,
                     waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
                     )
             )
@@ -186,10 +186,10 @@ class Simulation(object):
 
         while True:
             # Limit frame speed to 30 FPS
-            self.time_passed = self.clock.tick(30)
+            self.time_passed = self.clock.tick()
             
-            if self.time_passed > 100:
-                continue
+            # if self.time_passed > 100:
+            #     continue
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

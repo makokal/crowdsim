@@ -119,14 +119,14 @@ class Agent(Sprite):
 
 
     def update(self, time_passed):        
-        # self._change_direction(time_passed)
-        # displacement = vec2d(    
-        #     self.direction.x * self.max_speed * time_passed,
-        #     self.direction.y * self.max_speed * time_passed)            
-        # self.prev_pos = vec2d(self.pos)
-        # self.pos += displacement
+        self._change_direction(time_passed / 1000.0)
+        displacement = vec2d(    
+            self.direction.x * self.max_speed * (time_passed / 1000.0),
+            self.direction.y * self.max_speed * (time_passed / 1000.0))            
+        self.prev_pos = vec2d(self.pos)
+        self.pos += displacement
 
-        self.social_move(time_passed)
+        # self.social_move(time_passed / 1000.0)
         
         # When the image is rotated, its size is changed.
         self.image_w, self.image_h = self.image.get_size()
@@ -205,7 +205,7 @@ class Agent(Sprite):
             0.2 to 0.3 seconds.
         """
         self._counter += time_passed
-        if self._counter > randint(200, 300):
+        if self._counter > (randint(200, 300) / 1000.0):
             self.direction.rotate(45 * randint(-1, 1))
             self._counter = 0
 
