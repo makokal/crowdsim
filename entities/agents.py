@@ -119,14 +119,14 @@ class Agent(Sprite):
 
 
     def update(self, time_passed):        
-        self._change_direction(time_passed / 1000.0)
-        displacement = vec2d(    
-            self.direction.x * self.max_speed * (time_passed / 1000.0),
-            self.direction.y * self.max_speed * (time_passed / 1000.0))            
-        self.prev_pos = vec2d(self.pos)
-        self.pos += displacement
+        # self._change_direction(time_passed / 1000.0)
+        # displacement = vec2d(    
+        #     self.direction.x * self.max_speed * (time_passed / 1000.0),
+        #     self.direction.y * self.max_speed * (time_passed / 1000.0))            
+        # self.prev_pos = vec2d(self.pos)
+        # self.pos += displacement
 
-        # self.social_move(time_passed / 1000.0)
+        self.social_move(time_passed / 1000.0)
         
         # When the image is rotated, its size is changed.
         self.image_w, self.image_h = self.image.get_size()
@@ -155,32 +155,6 @@ class Agent(Sprite):
         self._desired_force = self._compute_desired_force()
         self._obstacle_force = self._compute_obstacle_force()
         self._lookahead_force = self._compute_lookahead_force()
-
-        # sum up all the forces
-        forces = Vector3(0, 0, 0)
-        forces[0] = 1*self.social_force[0] + 1*self.obstacle_force[0] + 1*self.desired_force[0] + self.lookahead_force[0]
-        forces[1] = 1*self.social_force[1] + 1*self.obstacle_force[1] + 1*self.desired_force[1] + self.lookahead_force[1]
-        forces[2] = 1*self.social_force[2] + 1*self.obstacle_force[2] + 1*self.desired_force[2] + self.lookahead_force[2]
-
-        # calculate the velocity based on the acceleration (forces) and momentum
-        velocity = Vector3(0, 0, 0)
-        momentum = 0.75
-
-        velocity[0] = momentum * self.vx + forces[0]
-        velocity[1] = momentum * self.vy + forces[1]
-        velocity[2] = 0.0 # TODO - add z dimension
-
-        # check is resulting speed is beyond maximum speed
-        if velocity.length() > self.max_speed:
-            velocity[0] = (velocity[0] / velocity.length()) * self.max_speed
-            velocity[1] = (velocity[1] / velocity.length()) * self.max_speed
-            velocity[2] = (velocity[2] / velocity.length()) * self.max_speed
-
-        # update positions and velocities
-        self._vx, self._vy = velocity[0], velocity[1]
-        displacement = vec2d(self.vx * time_passed, self.vy * time_passed)
-        self.prev_pos = vec2d(self.pos)
-        self.pos += displacement
 
 
     def _compute_direction(self, time_passed):

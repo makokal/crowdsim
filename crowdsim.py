@@ -8,6 +8,7 @@ from pygame.sprite import Sprite
 
 from entities import Agent, Waypoint, Obstacle
 from utils import Timer, Box, GridMap, SIM_COLORS, SCALE
+from controllers import SocialForceController
 
 class Simulation(object):
     """ 
@@ -50,6 +51,7 @@ class Simulation(object):
 
         self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
 
+        self.controller = SocialForceController(self)
 
 
     def get_field_rect(self):
@@ -173,7 +175,9 @@ class Simulation(object):
 
     def simulation_update(self):
         for agent in self.agents:
-            agent.update(1)
+            agent.social_force += pygame.math.Vector3(10,10,10)
+            agent.update(0.1)
+            self.controller.drive_single_step(agent, delta_time=0.1)
             agent.draw()
         self.draw()
 
