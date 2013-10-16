@@ -135,7 +135,7 @@ class Simulation(object):
         # waypoints
         self.waypoints = {
         'start': Waypoint(self.screen, 'start', 'normal', (2,1), 0.3),
-        'stop': Waypoint(self.screen, 'stop', 'normal', (4,5), 0.3),
+        'stop': Waypoint(self.screen, 'stop', 'normal', (3,5), 0.3),
         'fuel': Waypoint(self.screen, 'fuel', 'normal', (6,2), 0.3)
         }
 
@@ -164,18 +164,30 @@ class Simulation(object):
                     waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
                     )
             )
+        self.agents.add(
+                Agent(  agent_id = 2,
+                    screen = self.screen,
+                    game = self,
+                    agent_image = self.agent_image,
+                    field = self.field_rect,
+                    init_position = ( 2, 2),
+                    init_direction = (1, 1),
+                    max_speed = 1.14,
+                    waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
+                    )
+            )
 
         # add some obstacles
         self.obstacles = []
         self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2,3,1,1)))
-        # self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
+        self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
         self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (4,1,0.5,0)))
 
 
 
     def simulation_update(self):
         for agent in self.agents:
-            agent.social_force += pygame.math.Vector3(10,10,10)
+            # agent.social_force += pygame.math.Vector3(10,10,10)
             agent.update(0.1)
             self.controller.drive_single_step(agent, delta_time=0.1)
             agent.draw()
