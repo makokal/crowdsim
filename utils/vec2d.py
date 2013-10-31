@@ -276,6 +276,13 @@ class vec2d(object):
         cross = self.x*other[1] - self.y*other[0]
         dot = self.x*other[0] + self.y*other[1]
         return math.degrees(math.atan2(cross, dot))
+
+    def left_normal_vector(self):
+        return vec2d(-self.y, self.x)
+
+    def right_normal_vector(self):
+        return vec2d(self.y, -self.x)
+
             
     def normalized(self):
         length = self.length

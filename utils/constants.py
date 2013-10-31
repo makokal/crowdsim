@@ -13,3 +13,6 @@ SF_FACTORS = ForceFactor(
     obstacle = 10.0, 
     lookahead = 1.0
     )
+
+
+SIGN = lambda x: (1, -1)[x < 0.0]

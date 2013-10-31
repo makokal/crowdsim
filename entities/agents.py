@@ -5,7 +5,7 @@ from math import sin, cos, radians, exp, sqrt
 import pygame
 from pygame.sprite import Sprite
 from pygame.math import Vector3
-from utils import SIM_COLORS, SCALE
+from utils import SIM_COLORS, SCALE, SIGN
 from utils import euclidean_distance, vec2d
 
 
@@ -76,8 +76,8 @@ class Agent(Sprite):
 
         # The direction is a normalized vector
         self._direction = vec2d(init_direction).normalized()
-        self._velocity = self._direction[0], self._direction[1]
-        self._acceleration = [0, 0]
+        self._velocity = vec2d(init_direction)
+        self._acceleration = vec2d(0.0, 0.0)
 
         self._waypoints = waypoints
         self._waypoint_index = 0
@@ -250,29 +250,50 @@ class Agent(Sprite):
 
 
 
-     
 
     def _compute_social_force(self):
+        # variables according to Moussaid-Helbing paper
+        lambda_importance = 2.0
+        gamma = 0.35
+        n, n_prime = 2, 3
+
         social_force = Vector3(0, 0, 0)
-
         for neighbor in self._neighbors:
-            force = Vector3(0, 0, 0)
+            
+            # no social force with oneself
+            if neighbor.id == self.id:
+                continue
+            else:
+                # position difference
+                diff = neighbor.position - self.position
+                diff_direction = diff.normalized()
 
-            if not neighbor.id == self._id:
-                dist = self._position.get_distance(neighbor.position)
-                exp_dist = exp(sqrt(dist) - 1)
+                # velocity difference 
+                vel_diff = self.velocity - neighbor.velocity
 
-                # [2cm - 20m] range
-                if dist > (0.02 * SCALE) and dist < (20*SCALE):
-                    force[0] = (neighbor.position.x - self._position.x) / exp_dist
-                    force[1] = (neighbor.position.y - self._position.y) / exp_dist
+                # interaction direction t_ij
+                interaction_vector = lambda_importance * vel_diff + diff_direction
+                interaction_direction = interaction_vector / interaction_vector.get_length()
 
-                social_force[0] = force[0]
-                social_force[1] = force[1]
-                social_force[2] = force[2]
+                # theta (angle between interaction direction and position difference vector)
+                theta = interaction_direction.get_angle_between(diff_direction)
+
+                # model parameter B = gamma * ||D||
+                B = gamma * interaction_vector.get_length()
+                
+                theta_rad = radians(theta)
+                force_vel_amount = -exp(-diff.get_length() / B - (n_prime * B * theta_rad)**2)
+                force_angle_amount = (-1 * SIGN(theta)) * exp(-diff.get_length() / B - (n * B * theta_rad)**2)
+
+                force_vel = force_vel_amount * interaction_direction
+                force_angle = force_angle_amount * interaction_direction.left_normal_vector()
+
+                social_force[0] += force_vel.x + force_angle.x
+                social_force[1] += force_vel.y + force_angle.y
 
         return social_force
 
+        
 
 
     def _compute_desired_force(self):
