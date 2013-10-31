@@ -104,7 +104,7 @@ class Agent(Sprite):
         self.draw_forces()
 
         # agent horizon
-        pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), 50, int(1))
+        pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), int(self._radius*SCALE), int(1))
 
 
     def draw_forces(self):
@@ -316,23 +316,26 @@ class Agent(Sprite):
 
 
     def _compute_obstacle_force(self):
-        obstacle_force = Vector3(0, 0, 0)
+        obstacle_force = Vector3(0.0, 0.0, 0.0)
 
         # find the closest obstacle and the closest point on it
-        current_distance, current_ppoint = self.game.obstacles[0].agent_distance(self)
+        closest_distance, closest_point = self.game.obstacles[0].agent_distance(self)
         for obstacle in self.game.obstacles:
             other_distance, other_point = obstacle.agent_distance(self)
 
-            if other_distance < current_distance:
-                current_distance, current_ppoint = other_distance, other_point
+            if other_distance < closest_distance:
+                closest_distance, closest_point = other_distance, other_point
+        
 
-        # compute the direction of the force
-        obstacle_force[0] = -(self._position.x - current_ppoint[0]) / exp(current_distance - 1)
-        obstacle_force[1] = -(self._position.y - current_ppoint[1]) / exp(current_distance - 1)
-        # obstacle_force[0] = -(self.x - current_ppoint[0]) * self.max_speed
-        # obstacle_force[1] = -(self.y - current_ppoint[1]) * self.max_speed
+        distance = closest_distance - self._radius
+        force_amount = exp(-distance/0.8)
+        min_diffn = (vec2d(closest_point) - self._position).normalized()
+
+        obstacle_force[0] = -(force_amount * min_diffn).x
+        obstacle_force[1] = -(force_amount * min_diffn).y
 
         return obstacle_force
+
 
     def _compute_lookahead_force(self):
         lookahead_force = Vector3(0, 0, 0)

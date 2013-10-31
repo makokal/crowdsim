@@ -134,9 +134,9 @@ class Simulation(object):
         # popupate the scene with waypoints, obstacles and agents
         # waypoints
         self.waypoints = {
-        'start': Waypoint(self.screen, 'start', 'normal', (2,1), 0.3),
+        'start': Waypoint(self.screen, 'start', 'normal', (3,1), 0.3),
         'stop': Waypoint(self.screen, 'stop', 'normal', (3,5), 0.3),
-        'fuel': Waypoint(self.screen, 'fuel', 'normal', (6,2), 0.3)
+        # 'fuel': Waypoint(self.screen, 'fuel', 'normal', (6,2), 0.3)
         }
 
         # agents
@@ -146,10 +146,10 @@ class Simulation(object):
                     game = self,
                     agent_image = self.agent_image,
                     field = self.field_rect,
-                    init_position = ( 1, 1),
+                    init_position = ( 3, 1),
                     init_direction = (1, 1),
                     max_speed = 1.8,
-                    waypoints = [self.waypoints['stop'], self.waypoints['start'], self.waypoints['fuel']]
+                    waypoints = [self.waypoints['stop'], self.waypoints['start']]
                     )
             )
         self.agents.add(
@@ -158,30 +158,31 @@ class Simulation(object):
                     game = self,
                     agent_image = self.agent_image,
                     field = self.field_rect,
-                    init_position = ( 5, 4),
+                    init_position = ( 3, 5),
                     init_direction = (1, 1),
                     max_speed = 1.34,
-                    waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
-                    )
-            )
-        self.agents.add(
-                Agent(  agent_id = 2,
-                    screen = self.screen,
-                    game = self,
-                    agent_image = self.agent_image,
-                    field = self.field_rect,
-                    init_position = ( 2, 2),
-                    init_direction = (1, 1),
-                    max_speed = 1.14,
-                    waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
+                    waypoints = [self.waypoints['start'], self.waypoints['stop']]
                     )
             )
 
+        # self.agents.add(
+        #         Agent(  agent_id = 2,
+        #             screen = self.screen,
+        #             game = self,
+        #             agent_image = self.agent_image,
+        #             field = self.field_rect,
+        #             init_position = ( 2, 2),
+        #             init_direction = (1, 1),
+        #             max_speed = 1.14,
+        #             waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
+        #             )
+        #     )
+
         # add some obstacles
         self.obstacles = []
-        self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2,3,1,1)))
-        self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
-        self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (4,1,0.5,0)))
+        # self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2.5,3,1,1)))
+        # self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
+        self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (3.5,2.5,0.4,0)))
 
 
 

@@ -1,7 +1,7 @@
 from controllers import Controller
 from pygame.math import Vector3
-from utils import euclidean_distance, vec2d
-from utils import SCALE, SF_FACTORS
+from utils import vec2d
+from utils import SF_FACTORS
 
 
 class SocialForceController(Controller):
@@ -22,6 +22,9 @@ class SocialForceController(Controller):
         """ drive_single_step
         Drive the agent over a single simulation step
         """
+
+        # print agent.social_force, agent.desired_force, agent.obstacle_force
+
         # sum up all the forces
         forces = Vector3(0, 0, 0)
         forces[0] = SF_FACTORS.social * agent.social_force[0] + SF_FACTORS.obstacle * agent.obstacle_force[0] + \

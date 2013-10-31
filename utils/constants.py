@@ -10,7 +10,7 @@ SCALE = 100.0
 SF_FACTORS = ForceFactor(
     social = 2.1, 
     desired = 1.0, 
-    obstacle = 10.0, 
+    obstacle = 1.0, 
     lookahead = 1.0
     )
 
