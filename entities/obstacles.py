@@ -50,16 +50,16 @@ class Obstacle(object):
             point on the obstacle to the agent
         """
         if self.type == 'Line':
-            return self._line_intersection(self.params, (agent.x, agent.y))
+            return self._line_intersection(self.params, (agent.position.x, agent.position.y))
         elif self.type == 'Circle':
-            return self._circle_intersection(self.params, (agent.x, agent.y))
+            return self._circle_intersection(self.params, (agent.position.x, agent.position.y))
         elif self.type == 'Rect':
             x, y, w, h = self.params
             candidates = dict()
-            d1, p1 = self._line_intersection((x, y, x+w, y), (agent.x, agent.y))
-            d2, p2 = self._line_intersection((x, y, x, y+h), (agent.x, agent.y))
-            d3, p3 = self._line_intersection((x+w, y, x+w, y+h), (agent.x, agent.y))
-            d4, p4 = self._line_intersection((x, y+h, x+w, y+h), (agent.x, agent.y))
+            d1, p1 = self._line_intersection((x, y, x+w, y), (agent.position.x, agent.position.y))
+            d2, p2 = self._line_intersection((x, y, x, y+h), (agent.position.x, agent.position.y))
+            d3, p3 = self._line_intersection((x+w, y, x+w, y+h), (agent.position.x, agent.position.y))
+            d4, p4 = self._line_intersection((x, y+h, x+w, y+h), (agent.position.x, agent.position.y))
             candidates[d1] = p1
             candidates[d2] = p2
             candidates[d3] = p3

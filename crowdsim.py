@@ -65,7 +65,7 @@ class Simulation(object):
         neighbors =  []
         for other in self.agents:
             if not agent.id == other.id:
-                dist = agent.pos.get_distance(other.pos)
+                dist = agent.position.get_distance(other.position)
                 if dist <= dist_range:
                     neighbors.append(other)
 

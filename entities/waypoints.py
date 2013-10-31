@@ -56,10 +56,10 @@ class Waypoint(object):
 
     def attaction_force(self, agent, myx, myy, fromx, fromy):
         # TODO - clean this up
-        nx, ny = ((agent.y - fromy) / euclidean_distance((agent.x, agent.y), (fromx, fromy))), \
-                ((agent.x - fromx) / euclidean_distance((agent.x, agent.y), (fromx, fromy)))
-        oc11, oc12 = agent.x + self.radius * nx, agent.y - self.radius * ny
-        oc21, oc22 = agent.x - self.radius * nx, agent.y + self.radius * ny
+        nx, ny = ((agent.position.y - fromy) / euclidean_distance((agent.position.x, agent.position.y), (fromx, fromy))), \
+                ((agent.position.x - fromx) / euclidean_distance((agent.x, agent.position.y), (fromx, fromy)))
+        oc11, oc12 = agent.position.x + self.radius * nx, agent.position.y - self.radius * ny
+        oc21, oc22 = agent.position.x - self.radius * nx, agent.position.y + self.radius * ny
 
         pn = self.normal_point(myx, myy, oc11, oc12, oc21, oc22)
         pdist = euclidean_distance((myx, myy), (pn[0],pn[1]))
@@ -74,7 +74,7 @@ class Waypoint(object):
         """ Compute the force towards the waypoint from a single agent (direction only)
             The force is returned raw (not clipped to agents maximum speed, the controllers handle that)
         """
-        dx, dy = self.position[0] - agent.x, self.position[1] - agent.y
+        dx, dy = self.position[0] - agent.position.x, self.position[1] - agent.position.y
         theta = math.atan2(dy, dx)
         return (math.cos(theta), math.sin(theta), 0)
 

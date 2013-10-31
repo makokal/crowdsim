@@ -4,6 +4,7 @@ from vec2d import vec2d
 from gridmap import GridMap
 from colors import *
 from constants import *
+from custom_types import *
 
 
 
