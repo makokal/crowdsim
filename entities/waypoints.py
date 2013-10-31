@@ -7,6 +7,9 @@ import pygame
 
 class Waypoint(object):
     """ Agent waypoints in the scene """
+
+    __slots__  = ['screen', '_id', '_type', '_position', '_radius']
+
     def __init__(self, screen, wid, wtype, position, radius):
         """
             screen:
@@ -67,8 +70,9 @@ class Waypoint(object):
         return ((pn[0]-myx)/pdist, (pn[1]-myy)/pdist, 0 )
 
 
-    def force_to(self, agent):
-        """ Compute the force to the waypoint (direction only)
+    def force_towards(self, agent):
+        """ Compute the force towards the waypoint from a single agent (direction only)
+            The force is returned raw (not clipped to agents maximum speed, the controllers handle that)
         """
         dx, dy = self.position[0] - agent.x, self.position[1] - agent.y
         theta = math.atan2(dy, dx)

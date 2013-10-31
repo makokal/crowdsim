@@ -5,6 +5,8 @@ from gridmap import GridMap
 from colors import *
 from constants import *
 
+
+
 from math import sqrt
 
 def euclidean_distance(a, b):
