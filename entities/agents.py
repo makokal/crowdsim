@@ -130,7 +130,7 @@ class Agent(Sprite):
             advance to the next one. Reaching means being in the 
             waypoint circle
         """
-        if euclidean_distance((self.position.x, self.position.y), waypoint.position) <= waypoint.radius:
+        if euclidean_distance((self._position.x, self._position.y), waypoint.position) <= waypoint.radius:
             return True
         else:
             return False
@@ -308,9 +308,12 @@ class Agent(Sprite):
         wp_force = self.next_waypoint.force_towards(self)
 
         desired_force = Vector3(0, 0, 0)
-        desired_force[0] = wp_force[0] * self._vmax
-        desired_force[1] = wp_force[1] * self._vmax
-        desired_force[2] = wp_force[2] * self._vmax
+        # desired_force[0] = wp_force[0] * self._vmax
+        # desired_force[1] = wp_force[1] * self._vmax
+        # desired_force[2] = wp_force[2] * self._vmax
+
+        desired_force[0] = wp_force.x
+        desired_force[1] = wp_force.y
 
         return desired_force
 
@@ -328,11 +331,11 @@ class Agent(Sprite):
         
 
         distance = closest_distance - self._radius
-        force_amount = exp(-distance/0.8)
-        min_diffn = (vec2d(closest_point) - self._position).normalized()
+        force_amount = exp(-distance)
+        min_diffn = (self._position - vec2d(closest_point)).normalized()
 
-        obstacle_force[0] = -(force_amount * min_diffn).x
-        obstacle_force[1] = -(force_amount * min_diffn).y
+        obstacle_force[0] = (force_amount * min_diffn).x
+        obstacle_force[1] = (force_amount * min_diffn).y
 
         return obstacle_force
 

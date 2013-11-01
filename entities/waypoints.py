@@ -1,7 +1,7 @@
 # waypoints for agents to move to 
 
 from utils import SIM_COLORS, SCALE
-from utils import euclidean_distance
+from utils import euclidean_distance, vec2d
 import math
 import pygame
 
@@ -26,7 +26,7 @@ class Waypoint(object):
         self.screen = screen
         self._id = wid
         self._type = wtype
-        self._position = (position[0]*SCALE, position[1]*SCALE)  # stored internally in pixels
+        self._position = vec2d(position[0]*SCALE, position[1]*SCALE)  # stored internally in pixels
         self._radius = radius * SCALE # stored internally in pixels
 
 
@@ -36,7 +36,7 @@ class Waypoint(object):
         pygame.draw.circle(
             self.screen, 
             SIM_COLORS['maroon'], 
-            (int(self._position[0]), int(self._position[1])), 
+            (int(self._position.x), int(self._position.y)), 
             int(self._radius), 
             int(0))
 
@@ -74,9 +74,18 @@ class Waypoint(object):
         """ Compute the force towards the waypoint from a single agent (direction only)
             The force is returned raw (not clipped to agents maximum speed, the controllers handle that)
         """
-        dx, dy = self.position[0] - agent.position.x, self.position[1] - agent.position.y
-        theta = math.atan2(dy, dx)
-        return (math.cos(theta), math.sin(theta), 0)
+        # dx, dy = self.position[0] - agent.position.x, self.position[1] - agent.position.y
+        # theta = math.atan2(dy, dx)
+        # return (math.cos(theta), math.sin(theta), 0)
+
+        agent_pos = agent.position
+        destination = self._closest_point(agent_pos)
+        diff = destination - agent_pos
+        desired_direction = diff.normalized()
+        force = (desired_direction * agent._vmax - agent.velocity) / agent._relaxation_time
+
+        return force
+
 
 
     @property
@@ -89,10 +98,13 @@ class Waypoint(object):
 
     @property
     def position(self):
-        return (self._position[0] / SCALE, self._position[1] / SCALE)
+        return (self._position.x / SCALE, self._position.y / SCALE)
 
     @property
     def radius(self):
         return self._radius / SCALE
 
 
+
+    def _closest_point(self, agent_pos):
+        return self.position

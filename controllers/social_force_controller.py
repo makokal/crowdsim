@@ -35,21 +35,16 @@ class SocialForceController(Controller):
                     SF_FACTORS.desired * agent.desired_force[2] + SF_FACTORS.lookahead * agent.lookahead_force[2]
 
         # calculate the velocity based on the acceleration (forces) and momentum
-        velocity = Vector3(0, 0, 0)
-        momentum = 0.75
-
-        velocity[0] = momentum * velocity[0] + forces[0]
-        velocity[1] = momentum * velocity[1] + forces[1]
-        velocity[2] = 0.0 # TODO - add z dimension
+        agent._velocity.x += delta_time * forces[0]
+        agent._velocity.y += delta_time * forces[1]
 
         # check is resulting speed is beyond maximum speed
-        if velocity.length() > agent._vmax:
-            velocity[0] = (velocity[0] / velocity.length()) * agent._vmax
-            velocity[1] = (velocity[1] / velocity.length()) * agent._vmax
-            velocity[2] = (velocity[2] / velocity.length()) * agent._vmax
+        if agent._velocity.get_length() > agent._vmax:
+            agent._velocity.x = (agent._velocity.normalized().x) * agent._vmax
+            agent._velocity.y = (agent._velocity.normalized().y) * agent._vmax
 
         # update positions and velocities
-        displacement = vec2d(velocity[0] * delta_time, velocity[1] * delta_time)
+        displacement = agent._velocity * delta_time
         agent.prev_pos = vec2d(agent.position)
         agent.position += displacement
 
