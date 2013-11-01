@@ -137,15 +137,7 @@ class Agent(Sprite):
 
 
     def update(self, time_passed):        
-        # self._change_direction(time_passed / 1000.0)
-        # displacement = vec2d(    
-        #     self._direction.x * self.max_speed * (time_passed / 1000.0),
-        #     self._direction.y * self.max_speed * (time_passed / 1000.0))            
-        # self.prev_pos = vec2d(self._position)
-        # self._position += displacement
-
-        self.social_move(time_passed / 1000.0)
-        
+                
         # When the image is rotated, its size is changed.
         self._image_w, self._image_h = self._image.get_size()
         bounds_rect = self.screen.get_rect().inflate(-self._image_w, -self._image_h)
@@ -174,32 +166,6 @@ class Agent(Sprite):
         self._obstacle_force = self._compute_obstacle_force()
         self._lookahead_force = self._compute_lookahead_force()
 
-
-    def _compute_direction(self, time_passed):
-        """ Finds out where to go
-        """
-        coord = self.game.xy2coord(self._position)
-        
-        x_mid, y_mid = self.game.coord2xy_mid(coord)
-        
-        if (    (x_mid - self._position.x) * (x_mid - self.prev_pos.x) < 0 or
-                (y_mid - self._position.y) * (y_mid - self.prev_pos.y) < 0):
-            next_coord = (coord[0]+1, coord[1]+1)
-    
-            self._direction = vec2d(
-                next_coord[1] - coord[1],
-                next_coord[0] - coord[0]).normalized()
-
-    _counter = 0
-    
-    def _change_direction(self, time_passed):
-        """ Turn by 45 degrees in a random direction once per
-            0.2 to 0.3 seconds.
-        """
-        self._counter += time_passed
-        if self._counter > (randint(200, 300) / 1000.0):
-            self._direction.rotate(45 * randint(-1, 1))
-            self._counter = 0
 
 
     """ =================================================================  

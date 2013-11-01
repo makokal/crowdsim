@@ -23,6 +23,8 @@ class SocialForceController(Controller):
         Drive the agent over a single simulation step
         """
 
+        agent.social_move(delta_time / 1000.0)
+
         # print agent.social_force, agent.desired_force, agent.obstacle_force
 
         # sum up all the forces
