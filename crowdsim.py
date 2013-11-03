@@ -17,7 +17,7 @@ class Simulation(object):
 
     SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
     GRID_SIZE = 20
-    FIELD_SIZE = 700, 600
+    FIELD_SIZE = 640, 600
 
     def __init__(self, args=None):
         pygame.init()
