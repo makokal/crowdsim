@@ -5,6 +5,7 @@ from math import sin, cos, radians
 import pygame
 from pygame import Rect, Color
 from pygame.sprite import Sprite
+from pygame.locals import *
 
 from entities import Agent, Waypoint, Obstacle
 from utils import Timer, Box, GridMap, SIM_COLORS, SCALE
@@ -31,7 +32,30 @@ class Simulation(object):
             self.FIELD_SIZE = args['screen_width'], args['screen_height']
 
 
-        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), 0, 32)
+        # setup the screen and the box field of play 
+        self.initialize_screen()
+
+        # agents
+        self.agents = pygame.sprite.Group()
+        self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
+        self.controller = SocialForceController(self)
+        # self.controller = RandomController(self)
+
+
+        # time related items
+        self.clock = pygame.time.Clock()
+        self.paused = False
+        self.simulation_timer = Timer(50, self.simulation_update)
+
+        # create the grid
+        self.setup_grid()
+
+        # additional options (remove this)
+        self.options = dict(draw_grid=True)
+
+
+    def initialize_screen(self):
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), HWSURFACE|DOUBLEBUF|RESIZABLE)
         self.field_border_width = self.FIELD_BORDER_WIDTH
         self.field_rect_outer = Rect(0, 0, self.FIELD_SIZE[0], self.FIELD_SIZE[1])
         self.field_bgcolor = SIM_COLORS['black']
@@ -44,27 +68,11 @@ class Simulation(object):
 
         self.field_rect = self.get_field_rect()
 
-        self.clock = pygame.time.Clock()
-        self.paused = False
 
-        # agents
-        self.agents = pygame.sprite.Group()
-
-        self.simulation_timer = Timer(50, self.simulation_update)
-
-        # create the grid
+    def setup_grid(self):
         self.grid_nrows = self.FIELD_SIZE[1] / self.GRID_SIZE
         self.grid_ncols = self.FIELD_SIZE[0] / self.GRID_SIZE
-
         self.goal_coord = (self.grid_nrows - 1, self.grid_ncols - 1)
-
-
-        self.options = dict(draw_grid=True)
-
-        self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
-
-        self.controller = SocialForceController(self)
-        # self.controller = RandomController(self)
 
 
     def get_field_rect(self):
@@ -232,6 +240,13 @@ class Simulation(object):
                             self.options['draw_grid'] = not self.options['draw_grid']
                 elif (  event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
                     pass
+                elif event.type==VIDEORESIZE:
+                    self.screen = pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
+                    self.SCREEN_WIDTH, self.SCREEN_HEIGHT = event.dict['size']
+                    self.FIELD_SIZE = self.SCREEN_WIDTH, self.SCREEN_HEIGHT     # TODO - decouple this (field need be constant)
+                    self.initialize_screen()
+                    self.setup_grid()
+                    
             
             if not self.paused:     
                 self.simulation_timer.update(self.time_passed)
