@@ -140,7 +140,8 @@ class Agent(Sprite):
                 
         # When the image is rotated, its size is changed.
         self._image_w, self._image_h = self._image.get_size()
-        bounds_rect = self.screen.get_rect().inflate(-self._image_w, -self._image_h)
+        # bounds_rect = self.screen.get_rect().inflate(-self._image_w, -self._image_h)
+        bounds_rect = self.game.field_box.get_internal_rect()
         
         if self._position.x*SCALE < bounds_rect.left:
             self._position.x = bounds_rect.left/SCALE

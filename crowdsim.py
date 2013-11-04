@@ -15,14 +15,24 @@ class Simulation(object):
     The main simulation entry point 
     """
 
+    # basic defaults
     SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
     GRID_SIZE = 20
-    FIELD_SIZE = 640, 600
+    FIELD_SIZE = 700, 600
+    FIELD_BORDER_WIDTH = 5
 
     def __init__(self, args=None):
         pygame.init()
+
+        if args is not None:
+            self.SCREEN_HEIGHT = args['screen_height']
+            self.SCREEN_WIDTH = args['screen_width']
+            self.GRID_SIZE = args['cell_width']
+            self.FIELD_SIZE = args['screen_width'], args['screen_height']
+
+
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), 0, 32)
-        self.field_border_width = 4
+        self.field_border_width = self.FIELD_BORDER_WIDTH
         self.field_rect_outer = Rect(0, 0, self.FIELD_SIZE[0], self.FIELD_SIZE[1])
         self.field_bgcolor = SIM_COLORS['black']
         self.field_border_color = SIM_COLORS['red']
@@ -45,14 +55,16 @@ class Simulation(object):
         # create the grid
         self.grid_nrows = self.FIELD_SIZE[1] / self.GRID_SIZE
         self.grid_ncols = self.FIELD_SIZE[0] / self.GRID_SIZE
+
         self.goal_coord = (self.grid_nrows - 1, self.grid_ncols - 1)
 
-        self.options = dict(draw_grid=False)
+
+        self.options = dict(draw_grid=True)
 
         self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
 
-        # self.controller = SocialForceController(self)
-        self.controller = RandomController(self)
+        self.controller = SocialForceController(self)
+        # self.controller = RandomController(self)
 
 
     def get_field_rect(self):
@@ -166,18 +178,18 @@ class Simulation(object):
                     )
             )
 
-        # self.agents.add(
-        #         Agent(  agent_id = 2,
-        #             screen = self.screen,
-        #             game = self,
-        #             agent_image = self.agent_image,
-        #             field = self.field_rect,
-        #             init_position = ( 2, 2),
-        #             init_direction = (1, 1),
-        #             max_speed = 1.14,
-        #             waypoints = [self.waypoints['start'], self.waypoints['stop'], self.waypoints['fuel']]
-        #             )
-        #     )
+        self.agents.add(
+                Agent(  agent_id = 2,
+                    screen = self.screen,
+                    game = self,
+                    agent_image = self.agent_image,
+                    field = self.field_rect,
+                    init_position = ( 2, 2),
+                    init_direction = (1, 1),
+                    max_speed = 1.14,
+                    waypoints = [self.waypoints['start'], self.waypoints['stop']]
+                    )
+            )
 
         # add some obstacles
         self.obstacles = []
@@ -235,9 +247,5 @@ class Simulation(object):
 
     def quit(self):
         sys.exit()
-
-if __name__ == '__main__':
-    sim = Simulation()
-    sim.run()
 
         
