@@ -55,7 +55,8 @@ class Simulation(object):
 
 
     def initialize_screen(self):
-        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), HWSURFACE|DOUBLEBUF|RESIZABLE)
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), HWSURFACE|DOUBLEBUF|RESIZABLE, 32)
+        # self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), RESIZABLE, 32)
         self.field_border_width = self.FIELD_BORDER_WIDTH
         self.field_rect_outer = Rect(0, 0, self.FIELD_SIZE[0], self.FIELD_SIZE[1])
         self.field_bgcolor = SIM_COLORS['black']
@@ -241,7 +242,7 @@ class Simulation(object):
                 elif (  event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
                     pass
                 elif event.type==VIDEORESIZE:
-                    self.screen = pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
+                    # self.screen = pygame.display.set_mode(event.dict['size'], HWSURFACE|DOUBLEBUF|RESIZABLE, 32)
                     self.SCREEN_WIDTH, self.SCREEN_HEIGHT = event.dict['size']
                     self.FIELD_SIZE = self.SCREEN_WIDTH, self.SCREEN_HEIGHT     # TODO - decouple this (field need be constant)
                     self.initialize_screen()
