@@ -56,7 +56,6 @@ class Simulation(object):
 
     def initialize_screen(self):
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), HWSURFACE|DOUBLEBUF|RESIZABLE, 32)
-        # self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), 0, 32)
         self.field_border_width = self.FIELD_BORDER_WIDTH
         self.field_rect_outer = Rect(0, 0, self.FIELD_SIZE[0], self.FIELD_SIZE[1])
         self.field_bgcolor = SIM_COLORS['black']
@@ -217,6 +216,26 @@ class Simulation(object):
         self.draw()
 
 
+
+    def _process_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.paused = not self.paused
+                elif event.key == pygame.K_g:
+                    if pygame.key.get_mods() & pygame.KMOD_CTRL:
+                        self.options['draw_grid'] = not self.options['draw_grid']
+            elif (  event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                pass
+            elif event.type == VIDEORESIZE:
+                self.SCREEN_WIDTH, self.SCREEN_HEIGHT = event.dict['size']
+                self.FIELD_SIZE = self.SCREEN_WIDTH, self.SCREEN_HEIGHT     # TODO - decouple this (field need be constant)
+                self.initialize_screen()
+                self.setup_grid()
+
+
     def run(self):
         # initialize modules
         pygame.init()
@@ -225,41 +244,16 @@ class Simulation(object):
         self.demo_populate_scene()
 
         while True:
-            # Limit frame speed to 30 FPS
             self.time_passed = self.clock.tick()
             
-            # if self.time_passed > 100:
-            #     continue
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.quit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.paused = not self.paused
-                    elif event.key == pygame.K_g:
-                        if pygame.key.get_mods() & pygame.KMOD_CTRL:
-                            self.options['draw_grid'] = not self.options['draw_grid']
-                elif (  event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-                    pass
-                elif event.type == VIDEORESIZE:
-                    self.SCREEN_WIDTH, self.SCREEN_HEIGHT = event.dict['size']
-                    self.FIELD_SIZE = self.SCREEN_WIDTH, self.SCREEN_HEIGHT     # TODO - decouple this (field need be constant)
-                    self.initialize_screen()
-                    self.setup_grid()
-                    
+            # handle any events
+            self._process_events()
             
             if not self.paused:     
                 self.simulation_timer.update(self.time_passed)
-                
-                # Update and all agents
-                # for agent in self.agents:
-                    # agent.update(time_passed)
-                    
-                # self.draw()
-                
+            
+            # update the game surface
             pygame.display.flip()
-
 
     def quit(self):
         sys.exit()

@@ -2,7 +2,7 @@
 
 import pygame
 from utils import SIM_COLORS, SCALE
-from utils import euclidean_distance
+from utils import euclidean_distance, vec2d
 
 class Obstacle(object):
     """ Scene obstacles """
@@ -111,10 +111,10 @@ class Obstacle(object):
             intersected by a line from its center to the point
         """
         dist = euclidean_distance((circle[0], circle[1]), point) - circle[2]
-        v = pygame.math.Vector2((circle[0] - point[0]), (circle[1] - point[1]))
-        v.normalize_ip()
+        vun = vec2d((circle[0] - point[0]), (circle[1] - point[1]))
+        v = vun.normalized()
 
-        x, y = (point[0] + dist * v[0]), (point[0] + dist * v[0])
+        x, y = (point[0] + dist * v.x), (point[0] + dist * v.x)
 
         return dist, (x, y)
 
