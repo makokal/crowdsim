@@ -4,7 +4,7 @@ from math import sin, cos, radians, exp, sqrt
 
 import pygame
 from pygame.sprite import Sprite
-from pygame.math import Vector3
+# from pygame.math import vec2d
 from utils import SIM_COLORS, SCALE, SIGN
 from utils import euclidean_distance, vec2d
 
@@ -84,10 +84,10 @@ class Agent(Sprite):
         self._neighbors = []
 
         # # default no forces
-        self._social_force = Vector3(0.0, 0.0, 0.0)
-        self._desired_force = Vector3(0.0, 0.0, 0.0)
-        self._obstacle_force = Vector3(0.0, 0.0, 0.0)
-        self._lookahead_force = Vector3(0.0, 0.0, 0.0)
+        self._social_force = vec2d(0.0, 0.0)
+        self._desired_force = vec2d(0.0, 0.0)
+        self._obstacle_force = vec2d(0.0, 0.0)
+        self._lookahead_force = vec2d(0.0, 0.0)
 
 
     def draw(self):
@@ -224,7 +224,7 @@ class Agent(Sprite):
         gamma = 0.35
         n, n_prime = 2, 3
 
-        social_force = Vector3(0, 0, 0)
+        social_force = vec2d(0, 0)
         for neighbor in self._neighbors:
             
             # no social force with oneself
@@ -255,8 +255,10 @@ class Agent(Sprite):
                 force_vel = force_vel_amount * interaction_direction
                 force_angle = force_angle_amount * interaction_direction.left_normal_vector()
 
-                social_force[0] += force_vel.x + force_angle.x
-                social_force[1] += force_vel.y + force_angle.y
+                # social_force[0] += force_vel.x + force_angle.x
+                # social_force[1] += force_vel.y + force_angle.y
+
+                social_force += force_vel + force_angle
 
         return social_force
 
@@ -274,19 +276,21 @@ class Agent(Sprite):
 
         wp_force = self.next_waypoint.force_towards(self)
 
-        desired_force = Vector3(0, 0, 0)
+        desired_force = vec2d(0, 0)
         # desired_force[0] = wp_force[0] * self._vmax
         # desired_force[1] = wp_force[1] * self._vmax
         # desired_force[2] = wp_force[2] * self._vmax
 
-        desired_force[0] = wp_force.x
-        desired_force[1] = wp_force.y
+        # desired_force[0] = wp_force.x
+        # desired_force[1] = wp_force.y
+
+        desired_force = wp_force
 
         return desired_force
 
 
     def _compute_obstacle_force(self):
-        obstacle_force = Vector3(0.0, 0.0, 0.0)
+        obstacle_force = vec2d(0.0, 0.0)
 
         # find the closest obstacle and the closest point on it
         closest_distance, closest_point = self.game.obstacles[0].agent_distance(self)
@@ -301,14 +305,14 @@ class Agent(Sprite):
         force_amount = exp(-distance)
         min_diffn = (self._position - vec2d(closest_point)).normalized()
 
-        obstacle_force[0] = (force_amount * min_diffn).x
-        obstacle_force[1] = (force_amount * min_diffn).y
+        obstacle_force.x = (force_amount * min_diffn).x
+        obstacle_force.y = (force_amount * min_diffn).y
 
         return obstacle_force
 
 
     def _compute_lookahead_force(self):
-        lookahead_force = Vector3(0, 0, 0)
+        lookahead_force = vec2d(0, 0)
         return lookahead_force
 
 

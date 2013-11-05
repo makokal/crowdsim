@@ -1,5 +1,5 @@
 from controllers import Controller
-from pygame.math import Vector3
+# from pygame.math import Vectr3
 from utils import vec2d
 from utils import SF_FACTORS
 
@@ -28,17 +28,15 @@ class SocialForceController(Controller):
         # print agent.social_force, agent.desired_force, agent.obstacle_force
 
         # sum up all the forces
-        forces = Vector3(0, 0, 0)
-        forces[0] = SF_FACTORS.social * agent.social_force[0] + SF_FACTORS.obstacle * agent.obstacle_force[0] + \
+        forces = vec2d(0, 0)
+        forces.x = SF_FACTORS.social * agent.social_force[0] + SF_FACTORS.obstacle * agent.obstacle_force[0] + \
                     SF_FACTORS.desired * agent.desired_force[0] + SF_FACTORS.lookahead * agent.lookahead_force[0]
-        forces[1] = SF_FACTORS.social * agent.social_force[1] + SF_FACTORS.obstacle * agent.obstacle_force[1] + \
+        forces.y = SF_FACTORS.social * agent.social_force[1] + SF_FACTORS.obstacle * agent.obstacle_force[1] + \
                     SF_FACTORS.desired * agent.desired_force[1] + SF_FACTORS.lookahead * agent.lookahead_force[1]
-        forces[2] = SF_FACTORS.social * agent.social_force[2] + SF_FACTORS.obstacle * agent.obstacle_force[2] + \
-                    SF_FACTORS.desired * agent.desired_force[2] + SF_FACTORS.lookahead * agent.lookahead_force[2]
 
         # calculate the velocity based on the acceleration (forces) and momentum
-        agent._velocity.x += delta_time * forces[0]
-        agent._velocity.y += delta_time * forces[1]
+        agent._velocity.x += delta_time * forces.x
+        agent._velocity.y += delta_time * forces.y
 
         # check is resulting speed is beyond maximum speed
         if agent._velocity.get_length() > agent._vmax:
