@@ -218,8 +218,9 @@ class Simulation(object):
 
 
     def run(self):
-        # The main game loop
-        
+        # initialize modules
+        pygame.init()
+
         # populate the scene
         self.demo_populate_scene()
 
@@ -242,7 +243,6 @@ class Simulation(object):
                 elif (  event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
                     pass
                 elif event.type == VIDEORESIZE:
-                    # self.screen = pygame.display.set_mode(event.dict['size'], HWSURFACE|DOUBLEBUF|RESIZABLE, 32)
                     self.SCREEN_WIDTH, self.SCREEN_HEIGHT = event.dict['size']
                     self.FIELD_SIZE = self.SCREEN_WIDTH, self.SCREEN_HEIGHT     # TODO - decouple this (field need be constant)
                     self.initialize_screen()
