@@ -207,7 +207,6 @@ class Simulation(object):
         self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (2.5,3.5,0.4,0)))
 
 
-
     def simulation_update(self):
         for agent in self.agents:
             agent.update(0.1)
@@ -254,6 +253,7 @@ class Simulation(object):
             
             # update the game surface
             pygame.display.flip()
+
 
     def quit(self):
         sys.exit()
