@@ -1,1 +1,1 @@
-from scene_loader import *
+from scene_io import SceneIO
