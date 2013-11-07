@@ -1,5 +1,5 @@
 import os, sys
-from random import randint, choice
+from random import randint, choice, normalvariate
 from math import sin, cos, radians
 
 import pygame
@@ -7,7 +7,7 @@ from pygame import Rect
 from pygame.locals import *
 
 from entities import Agent, Waypoint, Obstacle
-from utils import Timer, Box, GridMap, SIM_COLORS
+from utils import Timer, Box, GridMap, SIM_COLORS, random_position
 from controllers import SocialForceController, RandomController
 
 class Simulation(object):
@@ -51,6 +51,11 @@ class Simulation(object):
 
         # additional options (remove this)
         self.options = dict(draw_grid=True)
+
+        # setup objects (waypoints, obstacles)
+        self.waypoints = dict()
+        self.obstacles = []
+        self._agent_count = 0
 
 
     def initialize_screen(self):
@@ -150,15 +155,10 @@ class Simulation(object):
             agent.draw()
 
 
+
     def demo_populate_scene(self):
         # popupate the scene with waypoints, obstacles and agents
-        # waypoints
-        self.waypoints = {
-        'start': Waypoint(self.screen, 'start', 'normal', (3,1), 0.3),
-        'stop': Waypoint(self.screen, 'stop', 'normal', (3,5), 0.3),
-        # 'fuel': Waypoint(self.screen, 'fuel', 'normal', (6,2), 0.3)
-        }
-
+       
         # agents
         self.agents.add(
                 Agent(  agent_id = 0,
@@ -198,13 +198,6 @@ class Simulation(object):
                     )
             )
 
-        # add some obstacles
-        self.obstacles = []
-        # self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2.5,3,1,1)))
-        self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
-        self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (3.5,2.5,0.4,0)))
-        self.obstacles.append(Obstacle(self.screen, 'tree2', 'Circle', (2.5,3.5,0.4,0)))
-
 
     def simulation_update(self):
         for agent in self.agents:
@@ -234,15 +227,21 @@ class Simulation(object):
                 self.setup_grid()
 
 
+    _total_time = 0
+
     def run(self):
         # initialize modules
         pygame.init()
 
         # populate the scene
-        self.demo_populate_scene()
+        # self.demo_populate_scene()
 
         while True:
             self.time_passed = self.clock.tick()
+
+            # self._total_time += self.time_passed
+            # if self._total_time < 1000:
+            #     continue
             
             # handle any events
             self._process_events()
@@ -254,6 +253,62 @@ class Simulation(object):
             pygame.display.flip()
 
 
+
+
+
+    def add_agents(self, agent_dict):
+        for agent in agent_dict:
+            dx, dy = float(agent['dx']), float(agent['dy'])
+            x, y = float(agent['x']), float(agent['y'])
+            num = int(agent['n'])
+            a_type = int(agent['type'])
+
+            # spawn an agent in a random direction and position(within dx, dy)
+            direction = (randint(-1, 1), randint(-1, 1))
+            position = random_position(x, y, dx, dy)
+            waypoints = [awp['id'] for awp in agent['addwaypoint']]
+
+            for _ in xrange(num):
+                self.agents.add(Agent(
+                        agent_id = self._agent_count,
+                        atype = a_type,
+                        screen = self.screen,
+                        game = self,
+                        agent_image = self.agent_image,
+                        field = self.field_rect,
+                        init_position = position,
+                        init_direction = direction,
+                        max_speed = normalvariate(1.34, 0.26),
+                        waypoints = [self.waypoints[wp] for wp in waypoints]
+                    ))
+                self._agent_count += 1
+
+        # we are done here
+        # TODO - move the velocity stuff to a neat function
+
+
+    
+    def add_waypoints(self, waypoint_dict):
+        for waypoint in waypoint_dict:
+            w_id = waypoint['id']
+            radius = float(waypoint['radius'])
+            wtype = waypoint['type']
+            x, y = float(waypoint['x']), float(waypoint['y'])
+            self.waypoints.update({w_id : Waypoint(screen=self.screen, wid=w_id, wtype=wtype, position=(x, y), radius=radius)})
+
+
+    def add_obstacles(self, obstacle_dict):
+        for obstacle in obstacle_dict:
+            o_id = obstacle['id']
+            p1 = float(obstacle['p1'])
+            p2 = float(obstacle['p2'])
+            p3 = float(obstacle['p3'])
+            p4 = float(obstacle['p4'])
+            o_type = obstacle['type'].title()
+            self.obstacles.append(Obstacle(screen=self.screen, oid=o_id, otype=o_type, params=(p1, p2, p3, p4)))
+
+
+    
     def quit(self):
         sys.exit()
 

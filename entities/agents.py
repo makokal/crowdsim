@@ -104,7 +104,10 @@ class Agent(Sprite):
         self.draw_forces()
 
         # agent horizon
-        pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), int(self._radius*SCALE), int(1))
+        if self._type == 0:
+            pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), int(self._radius*SCALE), int(1))
+        elif self._type == 1:
+            pygame.draw.circle(self.screen, SIM_COLORS['aqua'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), int(self._radius*SCALE), int(1))
 
 
     def draw_forces(self):
@@ -114,12 +117,12 @@ class Agent(Sprite):
                 ((self._position.x*SCALE) + self.desired_force[0]*SCALE, (self._position.y*SCALE) + self.desired_force[1]*SCALE))
 
         # social force
-        pygame.draw.line(self.screen, SIM_COLORS['green'],
+        pygame.draw.line(self.screen, SIM_COLORS['lime'],
                 ((self._position.x*SCALE), (self._position.y*SCALE)),
                 ((self._position.x*SCALE) + self.social_force[0]*SCALE, (self._position.y*SCALE) + self.social_force[1]*SCALE))
 
         # obstacle force
-        pygame.draw.line(self.screen, SIM_COLORS['aqua'],
+        pygame.draw.line(self.screen, SIM_COLORS['blue'],
                 ((self._position.x*SCALE), (self._position.y*SCALE)),
                 ((self._position.x*SCALE) + self.obstacle_force[0]*SCALE, (self._position.y*SCALE) + self.obstacle_force[1]*SCALE))
 
@@ -240,6 +243,9 @@ class Agent(Sprite):
 
                 # interaction direction t_ij
                 interaction_vector = lambda_importance * vel_diff + diff_direction
+                if (interaction_vector.get_length()) == 0:
+                    continue;
+
                 interaction_direction = interaction_vector / interaction_vector.get_length()
 
                 # theta (angle between interaction direction and position difference vector)
@@ -291,6 +297,10 @@ class Agent(Sprite):
 
     def _compute_obstacle_force(self):
         obstacle_force = vec2d(0.0, 0.0)
+
+        # if there are no obstacles, there is no obstacle force
+        if len(self.game.obstacles) == 0:
+            return obstacle_force
 
         # find the closest obstacle and the closest point on it
         closest_distance, closest_point = self.game.obstacles[0].agent_distance(self)

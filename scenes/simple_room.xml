@@ -8,21 +8,24 @@
 
     <!-- Waypoints : must be defined before agents. All units in metres -->
     <waypoint id="start" type="normal" x="3" y="1" radius="0.3"/>
-    <waypoint id="stop" type="normal" x="3" y="5" radius="0.3"/>
+    <waypoint id="stop" type="normal" x="2" y="7" radius="0.3"/>
+    <waypoint id="fuel" type="normal" x="7" y="5" radius="0.4"/>
 
     <!-- Obstacles -->
-    <obstacle id="tree" type="circle" p1="3.5" p2="2.5" p3="0.4" p4="0"/>
-    <obstacle id="stump" type="circle" p1="2.5" p2="3.5" p3="0.4" p4="0"/>
+    <obstacle id="tree" type="circle" p1="4" p2="2.5" p3="0.6" p4="0"/>
+    <obstacle id="stump" type="circle" p1="2" p2="3.5" p3="0.8" p4="0"/>
 
     <!-- Agents -->
-    <agent type="0" x="3" y="1" n="1" dx="0.5" dy="0.4">
+    <agent type="0" x="3" y="1" n="10" dx="0.5" dy="1.4">
         <addwaypoint id="start"/>
         <addwaypoint id="stop"/>
+        <addwaypoint id="fuel"/>
     </agent>
 
-    <agent type="1" x="3" y="5" n="1" dx="0.5" dy="0.4">
+    <agent type="1" x="3" y="5" n="10" dx="0.5" dy="0.4">
         <addwaypoint id="stop"/>
         <addwaypoint id="start"/>
+        <addwaypoint id="fuel"/>
     </agent>
 
 </simulation>

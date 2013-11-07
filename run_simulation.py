@@ -12,6 +12,11 @@ def start_main_simulation(params):
 
 if __name__ == '__main__':
     sio = SceneIO('scenes/simple_room.xml')
-    # pprint(sio.get_parameters())
+    # pprint(sio.get_waypoints())
     
-    start_main_simulation(sio.get_parameters())
+    sim = Simulation(params=sio.get_parameters())
+    sim.add_waypoints(waypoint_dict=sio.get_waypoints())
+    sim.add_obstacles(obstacle_dict=sio.get_obstacles())
+    sim.add_agents(agent_dict=sio.get_agents())
+
+    sim.run()
