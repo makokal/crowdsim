@@ -21,7 +21,7 @@ class Agent(Sprite):
 
     def __init__(self, agent_id, screen, game, agent_image,
             field, init_position, init_direction, max_speed, waypoints,
-            radius = 0.2, relaxation_time = 0.5, atype = '0'):
+            radius = 0.2, relaxation_time = 0.5, atype = 0):
         """ Create a new Agent.
         
             screen: 

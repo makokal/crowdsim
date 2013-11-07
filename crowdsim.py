@@ -204,7 +204,7 @@ class Simulation(object):
         # self.obstacles.append(Obstacle(self.screen, 'box', 'Rect', (2.5,3,1,1)))
         self.obstacles.append(Obstacle(self.screen, 'line', 'Line', (4,3,3,4)))
         self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (3.5,2.5,0.4,0)))
-        self.obstacles.append(Obstacle(self.screen, 'tree', 'Circle', (2.5,3.5,0.4,0)))
+        self.obstacles.append(Obstacle(self.screen, 'tree2', 'Circle', (2.5,3.5,0.4,0)))
 
 
     def simulation_update(self):

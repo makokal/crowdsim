@@ -1,0 +1,26 @@
+<simulation>
+
+    <!-- Parameters -->
+    <display width="800" height="800"/>
+    <cell width="10" height="10"/>
+
+    <!-- Waypoints : must be defined before agents. All units in metres -->
+    <waypoint id="start" type="normal" x="3" y="1" radius="0.3"/>
+    <waypoint id="stop" type="normal" x="3" y="5" radius="0.3"/>
+
+    <!-- Obstacles -->
+    <obstacle id="tree" type="circle" p1="3.5" p2="2.5" p3="0.4" p4="0"/>
+    <obstacle id="stump" type="circle" p1="2.5" p2="3.5" p3="0.4" p4="0"/>
+
+    <!-- Agents -->
+    <agent type="0" x="3" y="1" n="1" dx="0.5" dy="0.4">
+        <addwaypoint id="start"/>
+        <addwaypoint id="stop"/>
+    </agent>
+
+    <agent type="1" x="3" y="5" n="1" dx="0.5" dy="0.4">
+        <addwaypoint id="stop"/>
+        <addwaypoint id="start"/>
+    </agent>
+
+</simulation>
