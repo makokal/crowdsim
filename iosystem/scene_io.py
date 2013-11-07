@@ -27,8 +27,21 @@ class SceneIO(object):
         self._tree = ET.parse(self._scene_file).getroot()
         self._dict = self._etree_to_dict(self._tree)
 
-        # do the xml magic
-        pass
+
+    def get_agents(self):
+        return self._dict['simulation']['agent']
+
+
+    def get_obstacles(self):
+        return self._dict['simulation']['obstacle']
+
+
+    def get_waypoints(self):
+        return self._dict['simulation']['waypoint']
+
+
+    def get_parameters(self):
+        return self._dict['simulation']['parameters']
 
 
     def save_scene(self, filename):
@@ -36,7 +49,11 @@ class SceneIO(object):
         tree = ET.ElementTree(self._tree)
         tree.write(filename)
 
+
     def _etree_to_dict(self, t):
+        """ _etree_to_dict(t)
+            Convert an ET tree to python dict
+        """
         d = {t.tag: {} if t.attrib else None}
         children = list(t)
         if children:
@@ -46,7 +63,8 @@ class SceneIO(object):
                     dd[k].append(v)
             d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in dd.iteritems()}}
         if t.attrib:
-            d[t.tag].update(('@' + k, v) for k, v in t.attrib.iteritems())
+            # d[t.tag].update(('@' + k, v) for k, v in t.attrib.iteritems())
+            d[t.tag].update((k, v) for k, v in t.attrib.iteritems())
         if t.text:
             text = t.text.strip()
             if children or t.attrib:

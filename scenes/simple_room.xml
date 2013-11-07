@@ -1,8 +1,10 @@
 <simulation>
 
     <!-- Parameters -->
-    <display width="800" height="800"/>
-    <cell width="10" height="10"/>
+    <parameters>
+        <display width="800" height="800"/>
+        <cell width="10" height="10"/>
+    </parameters>
 
     <!-- Waypoints : must be defined before agents. All units in metres -->
     <waypoint id="start" type="normal" x="3" y="1" radius="0.3"/>

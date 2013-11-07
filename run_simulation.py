@@ -23,8 +23,6 @@ if __name__ == '__main__':
 
     # tree = ET.parse('scenes/simple_room.xml')
     # d = etree_to_dict(tree.getroot())
-    pprint(sio._dict['simulation']['agent'])
-    pprint(sio._dict['simulation']['obstacle'])
-    pprint(sio._dict['simulation']['waypoint'])
-
+    pprint(sio.get_parameters())
+    
     # start_main_simulation(params)
