@@ -44,7 +44,7 @@ class Simulation(object):
         # time related items
         self.clock = pygame.time.Clock()
         self.paused = False
-        self.simulation_timer = Timer(50, self.simulation_update)
+        self.simulation_timer = Timer(10, self.simulation_update)
 
         # create the grid
         self.setup_grid()

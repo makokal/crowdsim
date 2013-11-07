@@ -8,7 +8,7 @@ SCALE = 100.0
 
 # scaling factors the social force model
 SF_FACTORS = ForceFactor(
-    social = 3.1, 
+    social = 2.1, 
     desired = 1.0, 
     obstacle = 3.0, 
     lookahead = 1.0

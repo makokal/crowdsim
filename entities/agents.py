@@ -326,6 +326,9 @@ class Agent(Sprite):
         
 
         distance = closest_distance - self._radius
+        if closest_distance > self._radius*5:
+            return obstacle_force
+
         force_amount = exp(-distance)
         min_diffn = (self._position - vec2d(closest_point)).normalized()
 

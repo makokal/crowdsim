@@ -12,8 +12,10 @@
     <waypoint id="fuel" type="normal" x="7" y="5" radius="0.4"/>
 
     <!-- Obstacles -->
-    <obstacle id="tree" type="circle" p1="4" p2="2.5" p3="0.6" p4="0"/>
-    <obstacle id="stump" type="circle" p1="2" p2="3.5" p3="0.8" p4="0"/>
+    <!-- <obstacle id="tree" type="circle" p1="5" p2="2.5" p3="0.6" p4="0"/> -->
+    <obstacle id="stump" type="circle" p1="2" p2="4" p3="0.8" p4="0"/>
+    <obstacle id="box" type="rect" p1="4" p2="5" p3="1" p4="2"/>
+    <obstacle id="box" type="line" p1="2" p2="4" p3="5" p4="2"/>
 
     <!-- Agents -->
     <agent type="0" x="3" y="1" n="10" dx="0.5" dy="1.4">

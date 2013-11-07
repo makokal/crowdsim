@@ -103,6 +103,12 @@ class Obstacle(object):
         x, y = (x1 + u * (x2-x1)), (y1 + u * (y2-y1))
         dist = euclidean_distance((x,y), point)
 
+        # pygame.draw.circle(self.screen, SIM_COLORS['aqua'], 
+        #         (int(x*SCALE), int(y*SCALE)), 
+        #         int(40), 
+        #         0)
+        # print dist*SCALE, (x*SCALE,y*SCALE)
+
         return dist, (x, y)
 
 
