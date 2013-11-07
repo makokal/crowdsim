@@ -20,8 +20,7 @@ class SceneIO(object):
         """
         self._scene_file = scene_file
         self._tree = ET.parse(self._scene_file).getroot()
-        self._dict = self._etree_to_dict2(self._tree)
-        pprint(self._dict)
+        self._dict = self._etree_to_dict(self._tree)
 
 
     def load_scene(self, scene_file):
@@ -51,29 +50,7 @@ class SceneIO(object):
         tree.write(filename)
 
 
-    def _etree_to_dict(self, element):
-        node = dict()
-
-        text = getattr(element, 'text', None)
-        if text is not None:
-            node['text'] = text
-
-        node.update(element.items()) # element's attributes
-
-        child_nodes = {}
-        for child in element: # element's children
-            child_nodes.setdefault(child, []).append( self._etree_to_dict(child) )
-
-        # convert all single-element lists into non-lists
-        for key, value in child_nodes.items():
-            if len(value) == 1:
-                 child_nodes[key] = value[0]
-
-        node.update(child_nodes.items())
-
-        return node
-
-    def _etree_to_dict2(self, t):
+    def _etree_to_dict(self, t):
         """ _etree_to_dict(t)
             Convert an ET tree to python dict
         """
@@ -81,7 +58,7 @@ class SceneIO(object):
         children = list(t)
         if children:
             dd = defaultdict(list)
-            for dc in map(self._etree_to_dict2, children):
+            for dc in map(self._etree_to_dict, children):
                 for k, v in dc.iteritems():
                     dd[k].append(v)
             d = {t.tag: {k:v[0] if len(v) == 1 else v for k, v in dd.iteritems()}}
@@ -98,7 +75,3 @@ class SceneIO(object):
         return d
 
 
-
-
-
-        
