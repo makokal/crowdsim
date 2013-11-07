@@ -11,18 +11,7 @@ def start_main_simulation(params):
 
 
 if __name__ == '__main__':
-    params = {
-                'screen_width': 800,
-                'screen_height': 600,
-                'cell_width': 10
-            }
-
-
     sio = SceneIO('scenes/simple_room.xml')
-    # print sio._dict
-
-    # tree = ET.parse('scenes/simple_room.xml')
-    # d = etree_to_dict(tree.getroot())
-    pprint(sio.get_parameters())
+    # pprint(sio.get_parameters())
     
-    # start_main_simulation(params)
+    start_main_simulation(sio.get_parameters())

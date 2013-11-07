@@ -3,12 +3,11 @@ from random import randint, choice
 from math import sin, cos, radians
 
 import pygame
-from pygame import Rect, Color
-from pygame.sprite import Sprite
+from pygame import Rect
 from pygame.locals import *
 
 from entities import Agent, Waypoint, Obstacle
-from utils import Timer, Box, GridMap, SIM_COLORS, SCALE
+from utils import Timer, Box, GridMap, SIM_COLORS
 from controllers import SocialForceController, RandomController
 
 class Simulation(object):
@@ -22,14 +21,14 @@ class Simulation(object):
     FIELD_SIZE = 700, 600
     FIELD_BORDER_WIDTH = 5
 
-    def __init__(self, args=None):
+    def __init__(self, params=None):
         pygame.init()
 
-        if args is not None:
-            self.SCREEN_HEIGHT = args['screen_height']
-            self.SCREEN_WIDTH = args['screen_width']
-            self.GRID_SIZE = args['cell_width']
-            self.FIELD_SIZE = args['screen_width'], args['screen_height']
+        if params is not None:
+            self.SCREEN_HEIGHT = int(params['display']['height'])
+            self.SCREEN_WIDTH = int(params['display']['width'])
+            self.GRID_SIZE = int(params['cell']['width'])
+            self.FIELD_SIZE = self.SCREEN_HEIGHT, self.SCREEN_WIDTH
 
 
         # setup the screen and the box field of play 
