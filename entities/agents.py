@@ -1,13 +1,13 @@
 
 from random import randint, choice
-from math import sin, cos, radians, exp, sqrt
+from math import sin, cos, radians, exp, sqrt, fabs
 
 import pygame
 from pygame.sprite import Sprite
 # from pygame.math import vec2d
 from utils import SIM_COLORS, SCALE, SIGN
-from utils import euclidean_distance, vec2d
-
+from utils import euclidean_distance, vec2d, Rotate2D
+import numpy as np
 
 class Agent(Sprite):
     """ A agent sprite that bounces off walls and changes its
@@ -90,24 +90,33 @@ class Agent(Sprite):
         self._lookahead_force = vec2d(0.0, 0.0)
 
 
+
     def draw(self):
         """ 
         Draw the agent onto the screen that is set in the constructor
         """
+        x, y = int(self._position.x*SCALE), int(self._position.y*SCALE)
+        r = int(self._radius*SCALE)
+        # poly = [(x-r/2, y), (x, y-40), (x+r/2, y), (x, y+r/2)]
+        poly = np.array([[x-r/2, y], [x, y-30], [x+r/2, y], [x, y+r/2]])
+        rpoly = Rotate2D(poly, (x,y), radians(self._direction.get_angle()))
 
-        self.draw_rect = self._image.get_rect().move(
-            (self._position.x*SCALE) - self._image_w / 2, 
-            (self._position.y*SCALE) - self._image_h / 2)
-        self.screen.blit(self._image, self.draw_rect)
+        # self.draw_rect = self._image.get_rect().move(
+        #     self._position.x - self._image_w / 2, 
+        #     self._position.y - self._image_h / 2)
+        # self.screen.blit(self._image, self.draw_rect)
+
+        # agent representation
+        if self._type == 0:
+            pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (x, y), r, int(0))
+            # pygame.draw.ellipse(self.screen, SIM_COLORS['yellow'], (x, y, 20, 50), int(0))
+        elif self._type == 1:
+            pygame.draw.circle(self.screen, SIM_COLORS['white'], (x, y), r, int(0))
+            # pygame.draw.polygon(self.screen, SIM_COLORS['white'], rpoly, int(0))
+            # pygame.draw.ellipse(self.screen, SIM_COLORS['white'], self._get_ellipse_params(x, y, r, r/2), int(0))
 
         # draw the forces on the agent
         self.draw_forces()
-
-        # agent horizon
-        if self._type == 0:
-            pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), int(self._radius*SCALE), int(1))
-        elif self._type == 1:
-            pygame.draw.circle(self.screen, SIM_COLORS['aqua'], (int(self._position.x*SCALE), int(self._position.y*SCALE)), int(self._radius*SCALE), int(1))
 
 
     def draw_forces(self):
@@ -140,11 +149,16 @@ class Agent(Sprite):
 
 
     def update(self, time_passed):        
-                
+        
+        # cim = Image.open('assets/blueagent.bmp')
+        # rim = cim.rotate(self._direction.get_angle(), expand=1) 
+        # self._image = pygame.image.fromstring(rim.tostring(), rim.size, rim.mode)
+    
         # When the image is rotated, its size is changed.
-        self._image_w, self._image_h = self._image.get_size()
+        # self._image_w, self._image_h = self._image.get_size()
         # bounds_rect = self.screen.get_rect().inflate(-self._image_w, -self._image_h)
         bounds_rect = self.game.field_box.get_internal_rect()
+        self._direction = vec2d(self._velocity.x, -self._velocity.y)
         
         if self._position.x*SCALE < bounds_rect.left:
             self._position.x = bounds_rect.left/SCALE
@@ -324,6 +338,10 @@ class Agent(Sprite):
     def _compute_lookahead_force(self):
         lookahead_force = vec2d(0, 0)
         return lookahead_force
+
+
+    def _get_ellipse_params(self, x, y, w, h):
+        return ((x-w/2), (y-h/2), w, h)
 
 
 

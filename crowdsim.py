@@ -7,7 +7,7 @@ from pygame import Rect
 from pygame.locals import *
 
 from entities import Agent, Waypoint, Obstacle
-from utils import Timer, Box, GridMap, SIM_COLORS, random_position
+from utils import Timer, Box, GridMap, SIM_COLORS, random_position, random_fatness
 from controllers import SocialForceController, RandomController
 
 class Simulation(object):
@@ -268,6 +268,8 @@ class Simulation(object):
             position = random_position(x, y, dx, dy)
             waypoints = [awp['id'] for awp in agent['addwaypoint']]
 
+            rd = 0.3
+
             for _ in xrange(num):
                 self.agents.add(Agent(
                         agent_id = self._agent_count,
@@ -279,6 +281,7 @@ class Simulation(object):
                         init_position = position,
                         init_direction = direction,
                         max_speed = normalvariate(1.34, 0.26),
+                        radius = rd,
                         waypoints = [self.waypoints[wp] for wp in waypoints]
                     ))
                 self._agent_count += 1

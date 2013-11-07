@@ -261,6 +261,9 @@ class vec2d(object):
         x = self.x*cos - self.y*sin
         y = self.x*sin + self.y*cos
         return vec2d(x, y)
+
+    def tuple(self):
+        return (self.x, self.y)
     
     def get_angle(self):
         if (self.get_length_sqrd() == 0):
