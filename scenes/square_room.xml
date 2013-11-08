@@ -22,13 +22,13 @@
     <obstacle id="tri_right" type="line" p1="5" p2="3" p3="4" p4="5"/>
 
     <!-- Agents -->
-    <agent type="0" x="3" y="1" n="30" dx="0.5" dy="1.4">
+    <agent type="0" x="3" y="1" n="1" dx="0.5" dy="1.4">
         <addwaypoint id="start"/>
         <addwaypoint id="stop"/>
         <addwaypoint id="fuel"/>
     </agent>
 
-    <agent type="1" x="3" y="5" n="30" dx="0.5" dy="0.4">
+    <agent type="1" x="3" y="5" n="1" dx="0.5" dy="0.4">
         <addwaypoint id="stop"/>
         <addwaypoint id="start"/>
         <addwaypoint id="fuel"/>
