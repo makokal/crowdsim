@@ -7,8 +7,9 @@ from pygame import Rect
 from pygame.locals import *
 
 from entities import Agent, Waypoint, Obstacle
-from utils import Timer, Box, GridMap, SIM_COLORS, random_position, random_fatness
+from utils import Timer, Box, GridMap, SIM_COLORS, SCALE, random_position, random_fatness
 from controllers import SocialForceController, RandomController
+
 
 class Simulation(object):
     """ 
@@ -16,19 +17,25 @@ class Simulation(object):
     """
 
     # basic defaults
-    SCREEN_WIDTH, SCREEN_HEIGHT = 700, 600
+    SCREEN_WIDTH, SCREEN_HEIGHT = 700, 700
     GRID_SIZE = 20
-    FIELD_SIZE = 700, 600
-    FIELD_BORDER_WIDTH = 5
+    FIELD_SIZE = 600, 600
+    FIELD_BORDER_WIDTH = 0
+    FIELD_LIMITS = 0, 0, 600, 600
 
     def __init__(self, params=None):
         pygame.init()
 
         if params is not None:
-            self.SCREEN_HEIGHT = int(params['display']['height'])
-            self.SCREEN_WIDTH = int(params['display']['width'])
-            self.GRID_SIZE = int(params['cell']['width'])
-            self.FIELD_SIZE = self.SCREEN_HEIGHT, self.SCREEN_WIDTH
+            self.SCREEN_HEIGHT, self.SCREEN_WIDTH = int(float(params['display']['height']) * SCALE), \
+                                                    int(float(params['display']['width']) * SCALE)
+            self.FIELD_LIMITS = int(float(params['field_top_left_x']) * SCALE), \
+                                int(float(params['field_top_left_y']) * SCALE), \
+                                int(float(params['field_bottom_right_x']) * SCALE), \
+                                int(float(params['field_bottom_right_y']) * SCALE)
+            self.FIELD_SIZE = self.FIELD_LIMITS[2] - self.FIELD_LIMITS[0], self.FIELD_LIMITS[3] - self.FIELD_LIMITS[1]
+            self.GRID_SIZE = int(float(params['cell']['width']) * SCALE)
+
 
         # setup the screen and the box field of play 
         self.initialize_screen()
@@ -59,9 +66,10 @@ class Simulation(object):
         self.time_passed = 0
 
     def initialize_screen(self):
-        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), HWSURFACE|DOUBLEBUF|RESIZABLE, 32)
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT),
+                                              HWSURFACE | DOUBLEBUF | RESIZABLE, 32)
         self.field_border_width = self.FIELD_BORDER_WIDTH
-        self.field_rect_outer = Rect(0, 0, self.FIELD_SIZE[0], self.FIELD_SIZE[1])
+        self.field_rect_outer = Rect(self.FIELD_LIMITS[0], self.FIELD_LIMITS[1], self.FIELD_LIMITS[2], self.FIELD_LIMITS[3])
         self.field_bgcolor = SIM_COLORS['black']
         self.field_border_color = SIM_COLORS['red']
         self.field_box = Box(self.screen, 

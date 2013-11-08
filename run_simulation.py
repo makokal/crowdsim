@@ -19,4 +19,6 @@ if __name__ == '__main__':
     sim.add_obstacles(obstacle_dict=sio.get_obstacles())
     sim.add_agents(agent_dict=sio.get_agents())
 
+    print sio.get_field_size()
+
     sim.run()

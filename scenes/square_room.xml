@@ -2,8 +2,8 @@
 
     <!-- Parameters -->
     <parameters>
-        <display width="800" height="800"/>
-        <cell width="10" height="10"/>
+        <display width="7" height="7"/>
+        <cell width="0.1" height="0.1"/>
     </parameters>
 
     <!-- Waypoints : must be defined before agents. All units in metres -->
