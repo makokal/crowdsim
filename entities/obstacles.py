@@ -36,7 +36,7 @@ class Obstacle(object):
         elif self.type == 'Line':
             pygame.draw.line(self.screen, SIM_COLORS['blue'],
                 (int(self._params[0]), int(self._params[1])),
-                (int(self._params[2]), int(self._params[3])))
+                (int(self._params[2]), int(self._params[3])), 5)
         elif self.type == 'Rect':
             pygame.draw.rect(self.screen, SIM_COLORS['blue'],
                 (int(self._params[0]), int(self._params[1]),

@@ -18,10 +18,10 @@ class Simulation(object):
 
     # basic defaults
     SCREEN_WIDTH, SCREEN_HEIGHT = 700, 700
-    GRID_SIZE = 20
-    FIELD_SIZE = 600, 600
-    FIELD_BORDER_WIDTH = 0
+    GRID_SIZE = 20, 20
+    FIELD_SIZE = 500, 500
     FIELD_LIMITS = 0, 0, 600, 600
+    field_bgcolor = SIM_COLORS['white']
 
     def __init__(self, params=None):
         pygame.init()
@@ -34,10 +34,14 @@ class Simulation(object):
                                 int(float(params['field_bottom_right_x']) * SCALE), \
                                 int(float(params['field_bottom_right_y']) * SCALE)
             self.FIELD_SIZE = self.FIELD_LIMITS[2] - self.FIELD_LIMITS[0], self.FIELD_LIMITS[3] - self.FIELD_LIMITS[1]
-            self.GRID_SIZE = int(float(params['cell']['width']) * SCALE)
+            self.GRID_SIZE = int(float(params['cell']['width']) * SCALE), int(float(params['cell']['height']) * SCALE)
 
+        # zoom and centering
+        self.offset = 0, 0
+        self.zoom_factor = 1.0
+        self._old_screen = self.SCREEN_WIDTH, self.SCREEN_HEIGHT
 
-        # setup the screen and the box field of play 
+        # setup the screen and the box field of play
         self.initialize_screen()
 
         # agents
@@ -65,34 +69,28 @@ class Simulation(object):
         # initialize the time
         self.time_passed = 0
 
+
     def initialize_screen(self):
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT),
                                               HWSURFACE | DOUBLEBUF | RESIZABLE, 32)
-        self.field_border_width = self.FIELD_BORDER_WIDTH
-        self.field_rect_outer = Rect(self.FIELD_LIMITS[0], self.FIELD_LIMITS[1], self.FIELD_LIMITS[2], self.FIELD_LIMITS[3])
-        self.field_bgcolor = SIM_COLORS['black']
-        self.field_border_color = SIM_COLORS['red']
-        self.field_box = Box(self.screen, 
-            rect=self.field_rect_outer, 
-            bgcolor=self.field_bgcolor,
-            border_width=self.field_border_width,
-            border_color=self.field_border_color)
+        self.field_rect_outer = Rect(self.FIELD_LIMITS[0],
+                                     self.FIELD_LIMITS[1],
+                                     int(self.FIELD_SIZE[0]*self.zoom_factor),
+                                     int(self.FIELD_SIZE[1]*self.zoom_factor))
 
-        self.field_rect = self.get_field_rect()
+        self.field_box = Box(surface=self.screen,
+            rect=self.field_rect_outer, 
+            background_color=self.field_bgcolor
+        )
+
+        self.field_rect = self.field_box.get_internal_rect()
 
     def setup_grid(self):
-        self.grid_nrows = self.FIELD_SIZE[1] / self.GRID_SIZE
-        self.grid_ncols = self.FIELD_SIZE[0] / self.GRID_SIZE
-        self.goal_coord = (self.grid_nrows - 1, self.grid_ncols - 1)
-
-    def get_field_rect(self):
-        """ Return the internal field rect - the rect of the game
-            field exluding its border.
-        """
-        return self.field_box.get_internal_rect()
+        self.grid_nrows = self.FIELD_SIZE[1] / int(self.GRID_SIZE[0]*self.zoom_factor)
+        self.grid_ncols = self.FIELD_SIZE[0] / int(self.GRID_SIZE[1]*self.zoom_factor)
 
     def get_agent_neighbors(self, agent, dist_range):
-        neighbors =  []
+        neighbors = []
         for other in self.agents:
             if not agent.id == other.id:
                 dist = agent.position.get_distance(other.position)
@@ -106,21 +104,21 @@ class Simulation(object):
             pygame.draw.line(
                 self.screen,
                 SIM_COLORS['light gray'],
-                (self.field_rect.left, self.field_rect.top + y * self.GRID_SIZE - 1),
-                (self.field_rect.right - 1, self.field_rect.top + y * self.GRID_SIZE - 1))
+                (self.field_rect.left, self.field_rect.top + y * int(self.GRID_SIZE[1]*self.zoom_factor) - 1),
+                (self.field_rect.right - 1, self.field_rect.top + y * int(self.GRID_SIZE[1]*self.zoom_factor) - 1))
         
         for x in range(self.grid_ncols + 1):
             pygame.draw.line(
                 self.screen,
                 SIM_COLORS['light gray'],
-                (self.field_rect.left + x * self.GRID_SIZE - 1, self.field_rect.top),
-                (self.field_rect.left + x * self.GRID_SIZE - 1, self.field_rect.bottom - 1))
+                (self.field_rect.left + x * int(self.GRID_SIZE[0]*self.zoom_factor) - 1, self.field_rect.top),
+                (self.field_rect.left + x * int(self.GRID_SIZE[0]*self.zoom_factor) - 1, self.field_rect.bottom - 1))
 
     def xy2coord(self, pos):
         """ Convert a (x, y) pair to a (nrow, ncol) coordinate
         """
         x, y = (pos[0] - self.field_rect.left, pos[1] - self.field_rect.top)
-        return (int(y) / self.GRID_SIZE, int(x) / self.GRID_SIZE)
+        return int(y) / self.GRID_SIZE[1], int(x) / self.GRID_SIZE[0]
     
     def coord2xy_mid(self, coord):
         """ Convert a (nrow, ncol) coordinate to a (x, y) pair,
@@ -128,16 +126,11 @@ class Simulation(object):
         """
         nrow, ncol = coord
         return (
-            self.field_rect.left + ncol * self.GRID_SIZE + self.GRID_SIZE / 2, 
-            self.field_rect.top + nrow * self.GRID_SIZE + self.GRID_SIZE / 2)
+            self.field_rect.left + ncol * self.GRID_SIZE[0] + self.GRID_SIZE[0] / 2,
+            self.field_rect.top + nrow * self.GRID_SIZE[1] + self.GRID_SIZE[1] / 2)
 
     def draw_background(self):
-        bk_color = SIM_COLORS['gray']
-        x, y = 0, 0
-        width, height = self.SCREEN_WIDTH, self.SCREEN_HEIGHT
-
-        pygame.draw.rect(self.screen, bk_color, 
-            [x, y, width, height])
+        pygame.draw.rect(self.screen, SIM_COLORS['light gray'], [0, 0, self.SCREEN_WIDTH, self.SCREEN_HEIGHT])
 
     def draw(self):
         self.draw_background()
@@ -212,11 +205,28 @@ class Simulation(object):
                 elif event.key == pygame.K_g:
                     if pygame.key.get_mods() & pygame.KMOD_CTRL:
                         self.options['draw_grid'] = not self.options['draw_grid']
-            elif (  event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                elif event.key == pygame.K_PLUS or event.key == pygame.K_EQUALS:
+                    self.zoom_factor += 0.1
+                    self.initialize_screen()
+                    self.setup_grid()
+                elif event.key == pygame.K_MINUS:
+                    self.zoom_factor -= 0.1
+                    self.initialize_screen()
+                    self.setup_grid()
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pass
             elif event.type == VIDEORESIZE:
+                self._old_screen = self.SCREEN_WIDTH, self.SCREEN_HEIGHT
                 self.SCREEN_WIDTH, self.SCREEN_HEIGHT = event.dict['size']
-                self.FIELD_SIZE = self.SCREEN_WIDTH, self.SCREEN_HEIGHT     # TODO - decouple this (field need be constant)
+
+                self.offset = self.SCREEN_WIDTH - self._old_screen[0], self.SCREEN_HEIGHT - self._old_screen[1]
+                #self.FIELD_LIMITS = self.FIELD_LIMITS[0]+self.offset[0], self.FIELD_LIMITS[1]+self.offset[1], \
+                #                    self.FIELD_LIMITS[2], self.FIELD_LIMITS[3]
+
+                #fx = (self.SCREEN_WIDTH / 2) - (self.FIELD_SIZE[0] / 2)
+                #fy = (self.SCREEN_HEIGHT / 2) - (self.FIELD_SIZE[1] / 2)
+                #self.FIELD_LIMITS = fx, fy, self.FIELD_LIMITS[2], self.FIELD_LIMITS[3]
+
                 self.initialize_screen()
                 self.setup_grid()
 

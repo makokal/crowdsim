@@ -1,11 +1,14 @@
-import sys
 
 import pygame
 from pygame import Rect, Color
 
 
-class WidgetError(Exception): pass
-class LayoutError(WidgetError): pass
+class WidgetError(Exception):
+    pass
+
+
+class LayoutError(WidgetError):
+    pass
 
 
 class Box(object):
@@ -18,7 +21,7 @@ class Box(object):
     def __init__(self, 
             surface,
             rect,
-            bgcolor,
+            background_color,
             border_width=0,
             border_color=Color('black')):
         """ rect:
@@ -36,7 +39,7 @@ class Box(object):
         """
         self.surface = surface
         self.rect = rect
-        self.bgcolor = bgcolor
+        self.bgcolor = background_color
         self.border_width = border_width
         self.border_color = border_color
         
@@ -48,10 +51,11 @@ class Box(object):
             self.rect.height - self.border_width * 2)
         
     def draw(self):
-        pygame.draw.rect(self.surface, self.border_color, self.rect)        
+        #pygame.draw.rect(self.surface, self.border_color, self.rect)
         pygame.draw.rect(self.surface, self.bgcolor, self.in_rect)
 
     def get_internal_rect(self):
         """ The internal rect of the box.
         """
+        #return self.rect
         return self.in_rect
