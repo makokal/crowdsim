@@ -111,7 +111,7 @@ class Agent(Sprite):
             pygame.draw.circle(self.screen, SIM_COLORS['yellow'], (x, y), r, int(0))
             # pygame.draw.ellipse(self.screen, SIM_COLORS['yellow'], (x, y, 20, 50), int(0))
         elif self._type == 1:
-            pygame.draw.circle(self.screen, SIM_COLORS['white'], (x, y), r, int(0))
+            pygame.draw.circle(self.screen, SIM_COLORS['aqua'], (x, y), r, int(0))
             # pygame.draw.polygon(self.screen, SIM_COLORS['white'], rpoly, int(0))
             # pygame.draw.ellipse(self.screen, SIM_COLORS['white'], self._get_ellipse_params(x, y, r, r/2), int(0))
 
@@ -123,17 +123,17 @@ class Agent(Sprite):
         # desired force
         pygame.draw.line(self.screen, SIM_COLORS['red'],
                 ((self._position.x*SCALE), (self._position.y*SCALE)),
-                ((self._position.x*SCALE) + self.desired_force[0]*SCALE, (self._position.y*SCALE) + self.desired_force[1]*SCALE))
+                ((self._position.x*SCALE) + self.desired_force[0]*SCALE, (self._position.y*SCALE) + self.desired_force[1]*SCALE), 2)
 
         # social force
         pygame.draw.line(self.screen, SIM_COLORS['lime'],
                 ((self._position.x*SCALE), (self._position.y*SCALE)),
-                ((self._position.x*SCALE) + self.social_force[0]*SCALE, (self._position.y*SCALE) + self.social_force[1]*SCALE))
+                ((self._position.x*SCALE) + self.social_force[0]*SCALE, (self._position.y*SCALE) + self.social_force[1]*SCALE), 2)
 
         # obstacle force
         pygame.draw.line(self.screen, SIM_COLORS['blue'],
                 ((self._position.x*SCALE), (self._position.y*SCALE)),
-                ((self._position.x*SCALE) + self.obstacle_force[0]*SCALE, (self._position.y*SCALE) + self.obstacle_force[1]*SCALE))
+                ((self._position.x*SCALE) + self.obstacle_force[0]*SCALE, (self._position.y*SCALE) + self.obstacle_force[1]*SCALE), 2)
 
 
 

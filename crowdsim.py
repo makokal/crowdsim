@@ -206,11 +206,11 @@ class Simulation(object):
                     if pygame.key.get_mods() & pygame.KMOD_CTRL:
                         self.options['draw_grid'] = not self.options['draw_grid']
                 elif event.key == pygame.K_PLUS or event.key == pygame.K_EQUALS:
-                    self.zoom_factor += 0.1
+                    #self.zoom_factor += 0.1
                     self.initialize_screen()
                     self.setup_grid()
                 elif event.key == pygame.K_MINUS:
-                    self.zoom_factor -= 0.1
+                    #self.zoom_factor -= 0.1
                     self.initialize_screen()
                     self.setup_grid()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
