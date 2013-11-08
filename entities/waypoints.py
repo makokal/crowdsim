@@ -78,11 +78,21 @@ class Waypoint(object):
         # theta = math.atan2(dy, dx)
         # return (math.cos(theta), math.sin(theta), 0)
 
-        agent_pos = agent.position
-        destination = self._closest_point(agent_pos)
-        diff = destination - agent_pos
+        diff = self.position - agent.position
+
+        # e_alpha
         desired_direction = diff.normalized()
-        force = (desired_direction * agent._vmax - agent.velocity) / agent._relaxation_time
+
+        # actual velocity v_alpha
+        actual_velocity = agent.velocity
+
+        # desired velocity v_alpha_bar
+        desired_velocity = agent.vmax * desired_direction
+
+        # force = 1/relation_time * (desired_velocity - actual_velocity)
+        force = (1.0 / agent.relaxation_time) * (desired_velocity - actual_velocity)
+
+        #force = (desired_direction * agent._vmax - agent.velocity) / agent._relaxation_time
 
         return force
 
@@ -103,8 +113,3 @@ class Waypoint(object):
     @property
     def radius(self):
         return self._radius / SCALE
-
-
-
-    def _closest_point(self, agent_pos):
-        return self.position

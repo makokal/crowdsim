@@ -1,0 +1,37 @@
+<simulation>
+
+    <!-- Parameters -->
+    <parameters>
+        <display width="800" height="800"/>
+        <cell width="10" height="10"/>
+    </parameters>
+
+    <!-- Waypoints : must be defined before agents. All units in metres -->
+    <waypoint id="start" type="normal" x="3" y="2" radius="0.3"/>
+    <waypoint id="stop" type="normal" x="2" y="6" radius="0.3"/>
+    <waypoint id="fuel" type="normal" x="6" y="5" radius="0.4"/>
+
+    <!-- Obstacles -->
+    <obstacle id="wall_top" type="line" p1="1" p2="1" p3="7" p4="1"/>
+    <obstacle id="wall_bottom" type="line" p1="1" p2="7" p3="7" p4="7"/>
+    <obstacle id="wall_left" type="line" p1="1" p2="1" p3="1" p4="7"/>
+    <obstacle id="wall_right" type="line" p1="7" p2="1" p3="7" p4="7"/>
+
+    <obstacle id="tri_top" type="line" p1="3" p2="3" p3="5" p4="3"/>
+    <obstacle id="tri_left" type="line" p1="3" p2="3" p3="4" p4="5"/>
+    <obstacle id="tri_right" type="line" p1="5" p2="3" p3="4" p4="5"/>
+
+    <!-- Agents -->
+    <agent type="0" x="3" y="1" n="10" dx="0.5" dy="1.4">
+        <addwaypoint id="start"/>
+        <addwaypoint id="stop"/>
+        <addwaypoint id="fuel"/>
+    </agent>
+
+    <agent type="1" x="3" y="5" n="10" dx="0.5" dy="0.4">
+        <addwaypoint id="stop"/>
+        <addwaypoint id="start"/>
+        <addwaypoint id="fuel"/>
+    </agent>
+
+</simulation>

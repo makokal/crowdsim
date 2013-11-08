@@ -147,7 +147,6 @@ class Agent(Sprite):
         else:
             return False
 
-
     def update(self, time_passed):        
         
         # cim = Image.open('assets/blueagent.bmp')
@@ -172,7 +171,6 @@ class Agent(Sprite):
         elif self._position.y*SCALE > bounds_rect.bottom:
             self._position.y = bounds_rect.bottom/SCALE
             self._direction.y *= -1
-
 
     def social_move(self, time_passed):
         # force is computed over neighbors with 0.5m radius (= 0.5*100 px)
@@ -228,11 +226,16 @@ class Agent(Sprite):
         return self._acceleration
 
     @property
+    def vmax(self):
+        return self._vmax
+
+    @property
+    def relaxation_time(self):
+        return self._relaxation_time
+
+    @property
     def next_waypoint(self):
         return self._waypoints[self._waypoint_index]
-
-
-
 
     def _compute_social_force(self):
         # variables according to Moussaid-Helbing paper
@@ -289,7 +292,7 @@ class Agent(Sprite):
             self._waypoint_index += 1
 
         # if all waypoints are covered, go back to the beginning
-        # this does not take into account birth and death waypoints yet
+        # NOTE - this does not take into account birth and death waypoints yet
         if self._waypoint_index == len(self._waypoints):
             self._waypoint_index = 0
 
