@@ -186,10 +186,9 @@ class Agent(Sprite):
 
 
 
-    """ =================================================================  
-        Properties and how to compute them
-        =================================================================  
-    """
+    # =================================================================
+    #    Properties and how to compute them
+    # =================================================================
 
     @property
     def social_force(self):
@@ -295,14 +294,6 @@ class Agent(Sprite):
             self._waypoint_index = 0
 
         wp_force = self.next_waypoint.force_towards(self)
-
-        desired_force = vec2d(0, 0)
-        # desired_force[0] = wp_force[0] * self._vmax
-        # desired_force[1] = wp_force[1] * self._vmax
-        # desired_force[2] = wp_force[2] * self._vmax
-
-        # desired_force[0] = wp_force.x
-        # desired_force[1] = wp_force.y
 
         desired_force = wp_force
 

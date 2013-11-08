@@ -30,7 +30,6 @@ class Simulation(object):
             self.GRID_SIZE = int(params['cell']['width'])
             self.FIELD_SIZE = self.SCREEN_HEIGHT, self.SCREEN_WIDTH
 
-
         # setup the screen and the box field of play 
         self.initialize_screen()
 
@@ -39,7 +38,6 @@ class Simulation(object):
         self.agent_image = pygame.image.load('assets/blueagent.bmp').convert_alpha()
         self.controller = SocialForceController(self)
         # self.controller = RandomController(self)
-
 
         # time related items
         self.clock = pygame.time.Clock()
@@ -57,6 +55,8 @@ class Simulation(object):
         self.obstacles = []
         self._agent_count = 0
 
+        # initialize the time
+        self.time_passed = 0
 
     def initialize_screen(self):
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), HWSURFACE|DOUBLEBUF|RESIZABLE, 32)
@@ -72,19 +72,16 @@ class Simulation(object):
 
         self.field_rect = self.get_field_rect()
 
-
     def setup_grid(self):
         self.grid_nrows = self.FIELD_SIZE[1] / self.GRID_SIZE
         self.grid_ncols = self.FIELD_SIZE[0] / self.GRID_SIZE
         self.goal_coord = (self.grid_nrows - 1, self.grid_ncols - 1)
-
 
     def get_field_rect(self):
         """ Return the internal field rect - the rect of the game
             field exluding its border.
         """
         return self.field_box.get_internal_rect()
-
 
     def get_agent_neighbors(self, agent, dist_range):
         neighbors =  []
@@ -95,7 +92,6 @@ class Simulation(object):
                     neighbors.append(other)
 
         return neighbors
-
 
     def draw_grid(self):
         for y in range(self.grid_nrows + 1):
@@ -111,8 +107,7 @@ class Simulation(object):
                 SIM_COLORS['light gray'],
                 (self.field_rect.left + x * self.GRID_SIZE - 1, self.field_rect.top),
                 (self.field_rect.left + x * self.GRID_SIZE - 1, self.field_rect.bottom - 1))
-        
-    
+
     def xy2coord(self, pos):
         """ Convert a (x, y) pair to a (nrow, ncol) coordinate
         """
@@ -128,7 +123,6 @@ class Simulation(object):
             self.field_rect.left + ncol * self.GRID_SIZE + self.GRID_SIZE / 2, 
             self.field_rect.top + nrow * self.GRID_SIZE + self.GRID_SIZE / 2)
 
-
     def draw_background(self):
         bk_color = SIM_COLORS['gray']
         x, y = 0, 0
@@ -136,7 +130,6 @@ class Simulation(object):
 
         pygame.draw.rect(self.screen, bk_color, 
             [x, y, width, height])
-
 
     def draw(self):
         self.draw_background()
@@ -154,11 +147,7 @@ class Simulation(object):
         for agent in self.agents:
             agent.draw()
 
-
-
     def demo_populate_scene(self):
-        # popupate the scene with waypoints, obstacles and agents
-       
         # agents
         self.agents.add(
                 Agent(  agent_id = 0,
@@ -198,15 +187,12 @@ class Simulation(object):
                     )
             )
 
-
     def simulation_update(self):
         for agent in self.agents:
             agent.update(0.1)
             self.controller.drive_single_step(agent, delta_time=0.1)
             agent.draw()
         self.draw()
-
-
 
     def _process_events(self):
         for event in pygame.event.get():
@@ -226,15 +212,11 @@ class Simulation(object):
                 self.initialize_screen()
                 self.setup_grid()
 
-
     _total_time = 0
 
     def run(self):
         # initialize modules
         pygame.init()
-
-        # populate the scene
-        # self.demo_populate_scene()
 
         while True:
             self.time_passed = self.clock.tick()
@@ -251,10 +233,6 @@ class Simulation(object):
             
             # update the game surface
             pygame.display.flip()
-
-
-
-
 
     def add_agents(self, agent_dict):
         for agent in agent_dict:
@@ -288,8 +266,7 @@ class Simulation(object):
 
         # we are done here
         # TODO - move the velocity stuff to a neat function
-
-
+        # TODO - find a suitable fatness distribution
     
     def add_waypoints(self, waypoint_dict):
         for waypoint in waypoint_dict:
@@ -298,7 +275,6 @@ class Simulation(object):
             wtype = waypoint['type']
             x, y = float(waypoint['x']), float(waypoint['y'])
             self.waypoints.update({w_id : Waypoint(screen=self.screen, wid=w_id, wtype=wtype, position=(x, y), radius=radius)})
-
 
     def add_obstacles(self, obstacle_dict):
         for obstacle in obstacle_dict:
@@ -310,9 +286,5 @@ class Simulation(object):
             o_type = obstacle['type'].title()
             self.obstacles.append(Obstacle(screen=self.screen, oid=o_id, otype=o_type, params=(p1, p2, p3, p4)))
 
-
-    
     def quit(self):
         sys.exit()
-
-        
