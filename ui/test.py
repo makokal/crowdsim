@@ -28,7 +28,7 @@ class MyApp(App):
     def build(self):
         rw = RootWidget()
         # call update() every second
-        Clock.schedule_interval(rw.update, 1.0)
+        Clock.schedule_interval(rw.update, 0.1)
         return rw
 
 MyApp().run()
