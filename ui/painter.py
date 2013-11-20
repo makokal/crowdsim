@@ -31,21 +31,17 @@ class Cell(Widget):
 
 class Ball(Widget):
     """docstring for Ball"""
-    def __init__(self, **kwargs):
-        super(Ball, self).__init__(**kwargs)
-        self.pos = (200, 200)
-        with self.canvas:
-            Color(1, 1, 0.0)
-            self.circle = Ellipse(pos=self.pos, size=(50,50))
+    def __init__(self, color=Color(1., 1., 0.), **kwargs):
+        Widget.__init__(self, **kwargs)
+        self.size = (50,50)
+        self.circle = Ellipse(pos = self.pos, size = self.size)
+        self.canvas.add(color)
+        self.canvas.add(self.circle)
 
     def on_pos(self, obj, new_pos):
-        self.pos = 
-
-    def move(self, np):
-        self.pos = np
+        self.circle.pos = new_pos # when widget moves, so does the graphic instruction
 
         
-
 
 class Field(Widget):
     cell_size = 40
@@ -64,6 +60,15 @@ class Field(Widget):
 
         print self.height, self.width, self.pos, self.size
         self.draw_grid()
+        self.balls = []
+        self.draw_balls()
+
+
+    def draw_balls(self):
+        self.balls.append(Ball(Color(1., 0., 1.)))
+        self.balls.append(Ball(Color(0., 0., 1.)))
+        for ball in self.balls:
+            self.add_widget(ball)
 
     def draw_grid(self):
         with self.canvas:
@@ -74,12 +79,10 @@ class Field(Widget):
                     Line(rectangle=(row, col, self.cell_size, self.cell_size))
                     # Rectangle(pos=(row, col), size=(self.cell_size, self.cell_size))
 
-
-    def add_ball(self, b):
-        self.ball = b
-
     def on_touch_down(self, touch):
-        self.root.ball.move((touch.x, touch.y))
+        self.balls[0].pos = (touch.x, touch.y)
+        # self.balls.append(Ball(Color(1., 0., 1.)))
+        # self.root.ball.move((touch.x, touch.y))
         # with self.canvas:
         #     Color(1, 0.2, 0,2)
         #     Rectangle(pos=(touch.x, touch.y), size=(40,40))
@@ -89,12 +92,12 @@ class Field(Widget):
 class MyPaintApp(App):
 
     def build(self):
-        root = FloatLayout()
-        root.add_widget(Field())
-        root.add_widget(Ball())
-        # self.add_widget(b)
-        return root
-        # return Field()
+        # root = FloatLayout()
+        # root.add_widget(Field())
+        # root.add_widget(Ball())
+        # # self.add_widget(b)
+        # return root
+        return Field()
         # return MyPaintWidget()
 
 
